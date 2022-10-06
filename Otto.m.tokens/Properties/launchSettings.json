@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:16662",
+      "sslPort": 44323
+    }
+  },
+  "profiles": {
+    "Otto.m.tokens": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "PSQL_DB": "da9d8abu0oefhu",
+        "PSQL_PASS": "f78360e59983349c06ea65150515f3f3a3e2746bf669a8c284031f4448e8d947",
+        "PSQL_PORT": "5432",
+        "PSQL_SERVER": "ec2-44-198-82-71.compute-1.amazonaws.com",
+        "PSQL_USER": "oeywpepjriqzjb",
+
+        "APP_ID": "744560801851200",
+        "CLIENT_SECRET": "Bi64oFtxgykxm6HxTct19JY89hty21zp"
+      },
+      "applicationUrl": "https://localhost:7072;http://localhost:5072",
+      "dotnetRunMessages": true
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  }
+}

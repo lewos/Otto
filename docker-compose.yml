@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  otto.stock:
+    image: ${DOCKER_REGISTRY-}ottostock
+    build:
+      context: .
+      dockerfile: Otto.stock/Dockerfile
+
+  otto.users:
+    image: ${DOCKER_REGISTRY-}ottousers
+    build:
+      context: .
+      dockerfile: Otto.users/Dockerfile
+
+
+  otto.products:
+    image: ${DOCKER_REGISTRY-}ottoproducts
+    build:
+      context: .
+      dockerfile: Otto.products/Dockerfile
+
+
+  otto.m.tokens:
+    image: ${DOCKER_REGISTRY-}ottomtokens
+    build:
+      context: .
+      dockerfile: Otto.m.tokens/Dockerfile
+
+
+  otto.companies:
+    image: ${DOCKER_REGISTRY-}ottocompanies
+    build:
+      context: .
+      dockerfile: Otto.companies/Dockerfile
+

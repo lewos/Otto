@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.companies", "Otto.companies\Otto.companies.csproj", "{050776BE-C681-4B5E-BBF4-8B7963714A2F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.m.tokens", "Otto.m.tokens\Otto.m.tokens.csproj", "{F488E966-5155-4185-9B41-34D7FE258DF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.models", "Otto.models\Otto.models.csproj", "{8D3BCFA2-86BC-485B-BF28-97FCF605173A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.users", "Otto.users\Otto.users.csproj", "{92A9F1E1-1B20-4CDA-AB60-5E31B3BDC315}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otto.stock", "Otto.stock\Otto.stock.csproj", "{B60CF960-CCE7-4F54-A839-91FCA3C79FE7}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{534D396A-2283-4FCE-8E90-12CE06D8D993}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otto.products", "Otto.products\Otto.products.csproj", "{B86FCB7E-3D49-4DE5-9804-DC4ECDCC955A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{050776BE-C681-4B5E-BBF4-8B7963714A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{050776BE-C681-4B5E-BBF4-8B7963714A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{050776BE-C681-4B5E-BBF4-8B7963714A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{050776BE-C681-4B5E-BBF4-8B7963714A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F488E966-5155-4185-9B41-34D7FE258DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F488E966-5155-4185-9B41-34D7FE258DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F488E966-5155-4185-9B41-34D7FE258DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F488E966-5155-4185-9B41-34D7FE258DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D3BCFA2-86BC-485B-BF28-97FCF605173A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D3BCFA2-86BC-485B-BF28-97FCF605173A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D3BCFA2-86BC-485B-BF28-97FCF605173A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D3BCFA2-86BC-485B-BF28-97FCF605173A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92A9F1E1-1B20-4CDA-AB60-5E31B3BDC315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92A9F1E1-1B20-4CDA-AB60-5E31B3BDC315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92A9F1E1-1B20-4CDA-AB60-5E31B3BDC315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92A9F1E1-1B20-4CDA-AB60-5E31B3BDC315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B60CF960-CCE7-4F54-A839-91FCA3C79FE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B60CF960-CCE7-4F54-A839-91FCA3C79FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B60CF960-CCE7-4F54-A839-91FCA3C79FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B60CF960-CCE7-4F54-A839-91FCA3C79FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{534D396A-2283-4FCE-8E90-12CE06D8D993}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{534D396A-2283-4FCE-8E90-12CE06D8D993}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{534D396A-2283-4FCE-8E90-12CE06D8D993}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{534D396A-2283-4FCE-8E90-12CE06D8D993}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86FCB7E-3D49-4DE5-9804-DC4ECDCC955A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86FCB7E-3D49-4DE5-9804-DC4ECDCC955A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86FCB7E-3D49-4DE5-9804-DC4ECDCC955A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86FCB7E-3D49-4DE5-9804-DC4ECDCC955A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {48546EDC-033C-452F-B810-7DF88BBEED20}
+	EndGlobalSection
+EndGlobal
