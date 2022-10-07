@@ -16,12 +16,16 @@ namespace Otto.Models
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             //=> options.UseNpgsql($"Server=localhost;Port=5432;Database=postgres;Uid=postgres;Pwd=123456;");
-            options.UseSqlServer("Server=DESKTOP-B30N7LF\\SQLEXPRESS;Database=NewOtto;Trusted_Connection=True;");
-            //var dbHost = "localhost";
-            //var dbName = "Otto";
-            //var dbPass = "sqlpass";
-            //var connectionStrig = $"Data Source={dbHost}; Initial Catalog={dbName}; User ID=sa;Password={dbPass}";
-            //options.UseSqlServer(connectionStrig);
+            // options.UseSqlServer("Server=DESKTOP-B30N7LF\\SQLEXPRESS;Database=NewOtto;Trusted_Connection=True;");
+
+            var dbHost = Environment.GetEnvironmentVariable("MSSQL_HOST") ?? "localhost";
+            var dbPass = Environment.GetEnvironmentVariable("MSSQL_SA_PASSWORD")?? "Pa$w0rd2019";
+            var dbPID = Environment.GetEnvironmentVariable("MSSQL_PID") ?? "Express";
+            var dbName = "Otto";
+            Console.WriteLine($"---dbPass--- {dbPass}");
+
+            var connectionStrig = $"Data Source={dbHost}; Initial Catalog={dbName}; User ID=sa;Password={dbPass}";
+            options.UseSqlServer(connectionStrig);
         }
     }
 }

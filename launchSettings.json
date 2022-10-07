@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "mssql-server": "DoNotStart",
+        "otto.companies": "StartDebugging",
+        "otto.m.tokens": "StartDebugging",
+        "otto.products": "StartDebugging",
+        "otto.stock": "StartDebugging",
+        "otto.users": "StartDebugging",
+        "otto.requests": "StartDebugging"
+      }
+    }
+  }
+}

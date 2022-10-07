@@ -6,17 +6,17 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Otto.products/Otto.products.csproj", "Otto.products/"]
+COPY ["Otto.requests/Otto.requests.csproj", "Otto.requests/"]
 COPY ["Otto.models/Otto.models.csproj", "Otto.models/"]
-RUN dotnet restore "Otto.products/Otto.products.csproj"
+RUN dotnet restore "Otto.requests/Otto.requests.csproj"
 COPY . .
-WORKDIR "/src/Otto.products"
-RUN dotnet build "Otto.products.csproj" -c Release -o /app/build
+WORKDIR "/src/Otto.requests"
+RUN dotnet build "Otto.requests.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Otto.products.csproj" -c Release -o /app/publish
+RUN dotnet publish "Otto.requests.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Otto.products.dll"]
+ENTRYPOINT ["dotnet", "Otto.requests.dll"]

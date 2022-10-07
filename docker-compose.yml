@@ -1,36 +1,126 @@
 version: '3.4'
 
 services:
+
   otto.stock:
     image: ${DOCKER_REGISTRY-}ottostock
     build:
       context: .
       dockerfile: Otto.stock/Dockerfile
-
-  otto.users:
-    image: ${DOCKER_REGISTRY-}ottousers
-    build:
-      context: .
-      dockerfile: Otto.users/Dockerfile
-
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8086:80"
 
   otto.products:
     image: ${DOCKER_REGISTRY-}ottoproducts
     build:
       context: .
       dockerfile: Otto.products/Dockerfile
-
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8085:80"
 
   otto.m.tokens:
     image: ${DOCKER_REGISTRY-}ottomtokens
     build:
       context: .
       dockerfile: Otto.m.tokens/Dockerfile
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8084:80"
 
+  otto.requests:
+    image: ${DOCKER_REGISTRY-}ottorequests
+    build:
+        context: .
+        dockerfile: Otto.requests/Dockerfile
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8082:80"
 
   otto.companies:
     image: ${DOCKER_REGISTRY-}ottocompanies
     build:
       context: .
       dockerfile: Otto.companies/Dockerfile
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8081:80"
+  
+  otto.users:
+    image: ${DOCKER_REGISTRY-}ottousers
+    build:
+      context: .
+      dockerfile: Otto.users/Dockerfile
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8080:80"
+  
+  mssql-server:
+    container_name: mssql-server-new
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+        MSSQL_PID: "Express"
+    volumes:
+      - mssql-server-data:/var/opt/mssql/data
+    user: root
+    ports:
+      - "1433:1433"
+    networks:
+      - backend
 
+volumes:
+  mssql-server-data:
+
+networks:
+  backend:

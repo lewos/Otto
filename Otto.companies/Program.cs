@@ -11,42 +11,74 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-//}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
 
 app.MapGet("/api/companies", async (OttoDbContext db) =>
 {
     var companies = await db.Companies.ToListAsync();
     //return GetListStockDTO(aux);
-    return companies;
+    return Results.Ok(companies);
 });
 
 app.MapGet("/api/companies/{id}", async (OttoDbContext db, int id) =>
 {
     var company = await db.Companies.FindAsync(id);
     if (company is not null)
-        return company;
-    return null;
+        return Results.Ok(company);
+    return Results.NotFound();
+});
+
+app.MapGet("/api/companies/name/{id}", async (OttoDbContext db, string id) =>
+{
+    var company = await db.Companies.Where(c=> c.Name == id).FirstOrDefaultAsync();
+    if (company is not null)
+        return Results.Ok(company);
+    return Results.NotFound();
+
+});
+
+app.MapGet("/api/companies/cuit/{id}", async (OttoDbContext db, string id) =>
+{
+    var company = await db.Companies.Where(c => c.CUIT == id).FirstOrDefaultAsync();
+    if (company is not null)
+        return Results.Ok(company);
+    return Results.NotFound();
 });
 
 app.MapPost("/api/companies", async (OttoDbContext db, Company request) =>
 {
+    //check if userId exist
+    var user = await db.Users.Where(u => u.Id == request.CreatedByUserId && u.Rol == "Administrador").FirstOrDefaultAsync();
+    if(user is null)
+        return Results.Conflict("El usuario no existe o no tiene un rol de Administrador");
+
+    // check if cuit o name is alredy in db
+    var company = await db.Companies.Where(c => c.Name == request.Name || c.CUIT == request.CUIT).FirstOrDefaultAsync();
+    if (company is not null)
+        return Results.Conflict("Nombre o CUIT ya se encuentran registrados");
+
+
     await db.Companies.AddAsync(request);
     await db.SaveChangesAsync();
+
+    //update user's companyId
+    user.CompanyId = request.Id;
+    //db.Users.Update(user);
+    await db.SaveChangesAsync();
+
     return Results.Created($"/api/companies/{request.Id}", request);
 });
 
 app.MapPut("/api/companies/{id}", async (OttoDbContext db, Company request, int id) =>
 {
-    //var updateStock = StockMapper.GetStock(dto);
     var company = await db.Companies.FindAsync(id);
     if (company is null) return Results.NotFound();
+
+    //// check if user is in company and is admin
+    //var user = await db.Users.FindAsync(company.CreatedByUserId);
+
     UpdateFields(request, company);
     await db.SaveChangesAsync();
     return Results.NoContent();
@@ -54,6 +86,10 @@ app.MapPut("/api/companies/{id}", async (OttoDbContext db, Company request, int 
 
 app.MapDelete("/api/companies/{id}", async (OttoDbContext db, int id) =>
 {
+    // check if user is in company and is admin
+
+    //update user's company id
+
     var company = await db.Companies.FindAsync(id);
     if (company is null)
     {
