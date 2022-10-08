@@ -1,7 +1,7 @@
 ﻿using Microsoft.Net.Http.Headers;
 using Otto.models;
+using Otto.models.Responses;
 using Otto.products.DTO;
-using Otto.products.Models.Responses;
 using System.Text.Json;
 
 namespace Otto.products.Services
@@ -15,7 +15,7 @@ namespace Otto.products.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<StockResponse> GetStockByMUserIdAsync(long MUserId)
+        public async Task<StockResponse<StockDTO>> GetStockByMUserIdAsync(long MUserId)
         {
             try
             {
@@ -45,19 +45,19 @@ namespace Otto.products.Services
                     var listStockDTO = await JsonSerializer.DeserializeAsync
                         <List<StockDTO>>(contentStream);
 
-                    return new StockResponse(ResponseCode.OK, $"{ResponseCode.OK}", listStockDTO);
+                    return new StockResponse<StockDTO>(ResponseCode.OK, $"{ResponseCode.OK}", listStockDTO);
 
                 }
 
                 //si no lo encontro, verificar en donde leo la respuesta del servicio
-                return new StockResponse(ResponseCode.WARNING, $"Ocurrio un error al consulat el stock del usuario con el id {MUserId}", null);
+                return new StockResponse<StockDTO>(ResponseCode.WARNING, $"Ocurrio un error al consulat el stock del usuario con el id {MUserId}", null);
 
 
             }
             catch (Exception ex)
             {
                 //verificar en donde leo la respuesta del servicio
-                return new StockResponse(ResponseCode.ERROR, $"Error al obtener el stock del usuario con id {MUserId}. Ex : {ex}", null);
+                return new StockResponse<StockDTO>(ResponseCode.ERROR, $"Error al obtener el stock del usuario con id {MUserId}. Ex : {ex}", null);
 
             }
 

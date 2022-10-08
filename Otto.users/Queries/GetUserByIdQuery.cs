@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Otto.Models;
+using Otto.models;
 using Otto.users.Services;
 
 namespace Otto.users.Queries

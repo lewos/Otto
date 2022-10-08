@@ -69,7 +69,7 @@ namespace Otto.products.Services
             return result;
         }
 
-        private async Task<MTokenDTO> GetAccessToken(long mUserId)
+        private async Task<Token> GetAccessToken(long mUserId)
         {
             var res = await _accessTokenService.GetTokenCacheAsync(mUserId);
 
@@ -78,7 +78,7 @@ namespace Otto.products.Services
             return res.token;
         }
 
-        private bool hasTokenExpired(MTokenDTO token)
+        private bool hasTokenExpired(Token token)
         {
             var utcNow = DateTime.UtcNow;
             // Si expiro o si esta a punto de expirar

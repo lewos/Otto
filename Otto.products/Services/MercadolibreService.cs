@@ -1,7 +1,6 @@
 ﻿using Otto.models;
+using Otto.models.Responses;
 using Otto.products.DTO;
-using Otto.products.Models;
-using Otto.products.Models.Responses;
 using System.Text.Json;
 
 namespace Otto.products.Services
@@ -14,7 +13,7 @@ namespace Otto.products.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<MItemsSearchResponse> GetMItemsBySelledIdAsync(long MUserId, string AccessToken)
+        public async Task<MItemsSearchResponse<MItemsSearchDTO>> GetMItemsBySelledIdAsync(long MUserId, string AccessToken)
         {
             try
             {
@@ -44,11 +43,11 @@ namespace Otto.products.Services
                     //string jsonString = JsonSerializer.Serialize(mOrder);
                     //Console.WriteLine(jsonString);
 
-                    return new MItemsSearchResponse(ResponseCode.OK, $"{ResponseCode.OK}", mItemsSearchDTO);
+                    return new MItemsSearchResponse<MItemsSearchDTO>(ResponseCode.OK, $"{ResponseCode.OK}", mItemsSearchDTO);
 
                 }
                 //si no lo encontro, verificar en donde leo la respuesta del servicio
-                return new MItemsSearchResponse(ResponseCode.WARNING, $"No se obtuvo una respuesta correcta al consultar los productos del usuario {MUserId}", null);
+                return new MItemsSearchResponse<MItemsSearchDTO>(ResponseCode.WARNING, $"No se obtuvo una respuesta correcta al consultar los productos del usuario {MUserId}", null);
 
 
             }
@@ -56,12 +55,12 @@ namespace Otto.products.Services
             {
                 Console.WriteLine($"Error al obtener los productos del usuario {MUserId}. Ex : {ex}");
                 //verificar en donde leo la respuesta del servicio
-                return new MItemsSearchResponse(ResponseCode.ERROR, $"Error al obtener los productos del usuario {MUserId}. Ex : {ex}", null);
+                return new MItemsSearchResponse<MItemsSearchDTO>(ResponseCode.ERROR, $"Error al obtener los productos del usuario {MUserId}. Ex : {ex}", null);
 
             }
         }
 
-        public async Task<MProductsSearchResponse> GetMProductsByItemsAsync(string concatItems, string AccessToken)
+        public async Task<MProductsSearchResponse<MProductsSearchDTO>> GetMProductsByItemsAsync(string concatItems, string AccessToken)
         {
             try
             {
@@ -91,11 +90,11 @@ namespace Otto.products.Services
                     //string jsonString = JsonSerializer.Serialize(mOrder);
                     //Console.WriteLine(jsonString);
 
-                    return new MProductsSearchResponse(ResponseCode.OK, $"{ResponseCode.OK}", mProductsSearchDTO);
+                    return new MProductsSearchResponse<MProductsSearchDTO>(ResponseCode.OK, $"{ResponseCode.OK}", mProductsSearchDTO);
 
                 }
                 //si no lo encontro, verificar en donde leo la respuesta del servicio
-                return new MProductsSearchResponse(ResponseCode.WARNING, $"No se obtuvo una respuesta correcta al consultar los items {concatItems}", null);
+                return new MProductsSearchResponse<MProductsSearchDTO>(ResponseCode.WARNING, $"No se obtuvo una respuesta correcta al consultar los items {concatItems}", null);
 
 
             }
@@ -103,7 +102,7 @@ namespace Otto.products.Services
             {
                 Console.WriteLine($"Error al obtener los items {concatItems}. Ex : {ex}");
                 //verificar en donde leo la respuesta del servicio
-                return new MProductsSearchResponse(ResponseCode.ERROR, $"Error al obtener los items {concatItems}. Ex : {ex}", null);
+                return new MProductsSearchResponse<MProductsSearchDTO>(ResponseCode.ERROR, $"Error al obtener los items {concatItems}. Ex : {ex}", null);
 
             }
         }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Otto.Models
+namespace Otto.models
 {
     public class Token: IToken
     {

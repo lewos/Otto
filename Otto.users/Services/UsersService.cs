@@ -1,4 +1,4 @@
-﻿using Otto.Models;
+﻿using Otto.models;
 
 namespace Otto.users.Services
 {

@@ -1,11 +1,11 @@
-﻿namespace Otto.Models
+﻿namespace Otto.models
 {
     public class StockRequest: IProductInStock
     {
         public int Id { get; set; }
+        public DateTime? Created { get; set; }
+        public DateTime? Modified { get; set; }
         public State State { get; set; }
-        public int UserCompanyId { get; set; }
-        public UserCompany UserCompany { get; set; }
         public string? Category { get; set; }
         public string? Code { get; set; }
         public string? Description { get; set; }
@@ -22,5 +22,7 @@
         public string? TSellerId { get; set; }
         public int UserId { get; set; }
         public int CompanyId { get; set; }
+        public string? Size { get; set; }
+        public string? Batch { get; set; }
     }
 }

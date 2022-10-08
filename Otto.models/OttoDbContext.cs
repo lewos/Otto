@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Otto.Models
+namespace Otto.models
 {
     public class OttoDbContext : DbContext
     {

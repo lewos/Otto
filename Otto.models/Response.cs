@@ -1,6 +1,4 @@
-﻿using Otto.models;
-
-namespace Otto.Models
+﻿namespace Otto.models
 {
     public class Response<T>
     {

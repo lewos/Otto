@@ -10,7 +10,8 @@
         "otto.products": "StartDebugging",
         "otto.stock": "StartDebugging",
         "otto.users": "StartDebugging",
-        "otto.requests": "StartDebugging"
+        "otto.requests": "StartDebugging",
+        "otto.orders": "StartDebugging"
       }
     }
   }

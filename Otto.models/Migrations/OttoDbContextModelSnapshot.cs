@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Otto.Models;
+using Otto.models;
 
 #nullable disable
 
@@ -22,7 +22,7 @@ namespace Otto.models.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Otto.Models.Company", b =>
+            modelBuilder.Entity("Otto.models.Company", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,7 +70,7 @@ namespace Otto.models.Migrations
                     b.ToTable("Companies");
                 });
 
-            modelBuilder.Entity("Otto.Models.JoinRequest", b =>
+            modelBuilder.Entity("Otto.models.JoinRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -98,7 +98,7 @@ namespace Otto.models.Migrations
                     b.ToTable("JoinRequests");
                 });
 
-            modelBuilder.Entity("Otto.Models.Order", b =>
+            modelBuilder.Entity("Otto.models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -106,8 +106,14 @@ namespace Otto.models.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EAN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("InProgress")
                         .HasColumnType("bit");
@@ -159,24 +165,27 @@ namespace Otto.models.Migrations
                     b.Property<string>("StateDescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UserIdInProgress")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("UserIdInProgress")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Otto.Models.ProductInStock", b =>
+            modelBuilder.Entity("Otto.models.ProductInStock", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Batch")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -215,6 +224,9 @@ namespace Otto.models.Migrations
 
                     b.Property<string>("SellerIdMail")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Size")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
@@ -237,13 +249,16 @@ namespace Otto.models.Migrations
                     b.ToTable("ProductsInStock");
                 });
 
-            modelBuilder.Entity("Otto.Models.StockRequest", b =>
+            modelBuilder.Entity("Otto.models.StockRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Batch")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -254,6 +269,9 @@ namespace Otto.models.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -262,6 +280,9 @@ namespace Otto.models.Migrations
 
                     b.Property<string>("MSellerId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -284,6 +305,9 @@ namespace Otto.models.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Size")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("State")
                         .HasColumnType("int");
 
@@ -296,20 +320,15 @@ namespace Otto.models.Migrations
                     b.Property<string>("TSellerId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserCompanyId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserCompanyId");
-
                     b.ToTable("StockRequests");
                 });
 
-            modelBuilder.Entity("Otto.Models.Token", b =>
+            modelBuilder.Entity("Otto.models.Token", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -360,7 +379,7 @@ namespace Otto.models.Migrations
                     b.ToTable("Tokens");
                 });
 
-            modelBuilder.Entity("Otto.Models.User", b =>
+            modelBuilder.Entity("Otto.models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -399,59 +418,6 @@ namespace Otto.models.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Otto.Models.UserCompany", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserCompany");
-                });
-
-            modelBuilder.Entity("Otto.Models.StockRequest", b =>
-                {
-                    b.HasOne("Otto.Models.UserCompany", "UserCompany")
-                        .WithMany()
-                        .HasForeignKey("UserCompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserCompany");
-                });
-
-            modelBuilder.Entity("Otto.Models.UserCompany", b =>
-                {
-                    b.HasOne("Otto.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Otto.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

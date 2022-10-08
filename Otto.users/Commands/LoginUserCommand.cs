@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Otto.Models;
+using Otto.models;
 using Otto.users.Services;
 using System.Text.Json.Serialization;
 

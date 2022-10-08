@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Otto.Models
+namespace Otto.models
 {
     [Index(nameof(Id), nameof(Mail), IsUnique = true)]
     public class User

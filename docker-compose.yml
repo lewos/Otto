@@ -53,6 +53,27 @@ services:
     ports:
       - "8084:80"
 
+  otto.orders:
+    image: ${DOCKER_REGISTRY-}ottoorders
+    build:
+      context: .
+      dockerfile: Otto.orders/Dockerfile
+    depends_on:
+      - mssql-server
+    networks:
+      - backend
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+      APP_ID: "744560801851200"
+      APP_MUSER_ID_OWNER: "302735131"
+      CLIENT_SECRET: "Bi64oFtxgykxm6HxTct19JY89hty21zp"
+      REDIRECT_URI: "https://0b9e-190-195-147-188.sa.ngrok.io/api/MOrders"
+    ports:
+      - "8083:80"
+  
   otto.requests:
     image: ${DOCKER_REGISTRY-}ottorequests
     build:
@@ -124,3 +145,4 @@ volumes:
 
 networks:
   backend:
+

@@ -70,6 +70,15 @@ namespace Otto.users.Controllers
             return Ok(result);
         }
 
+        // PUT api/<UsersController>/5
+        [HttpPut("UpdateAfterTokenUserCommand/{id}")]
+        public async Task<IActionResult> UpdateAfterTokenUserCommand(int id, [FromBody] UpdateAfterTokenUserCommand command)
+        {
+            command.Id = id;
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
         // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)

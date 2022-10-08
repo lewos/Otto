@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Otto.Models;
+using Otto.models;
 using Otto.users.Commands;
 
 namespace Otto.users
@@ -11,6 +11,8 @@ namespace Otto.users
             // request to entity model
             CreateMap<CreateUserCommand, User>();
             CreateMap <UpdateUserCommand, User>();
+            CreateMap <UpdateAfterTokenUserCommand, User>();
+
 
             //entity model to response
             CreateMap<User, CreateUserCommandResponse>();

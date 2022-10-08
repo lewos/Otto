@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Otto.Models;
-using System;
-using System.Collections.Generic;
+using Otto.models;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -148,8 +146,10 @@ app.MapPut("/api/requests/{id}/{state}", async (OttoDbContext db, JoinRequestApp
             joinRequest.Modified = DateTime.Now;
             await db.SaveChangesAsync();
 
-            //update user company id
-            user.CompanyId = joinRequest.CompanyId;
+            //update client user company id
+            var clientUser = await db.Users.FindAsync(joinRequest.UserId);
+
+            clientUser.CompanyId = joinRequest.CompanyId;
             await db.SaveChangesAsync();
 
             return Results.NoContent();
@@ -214,7 +214,6 @@ public class JoinRequestApplicant
     [JsonPropertyName("modifiedByUserId")]
     public int ApplicantUserId { get; set; }
 }
-
 
 public class JoinRequestResponse 
 {

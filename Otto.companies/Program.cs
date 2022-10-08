@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Otto.Models;
+using Otto.models;
 
 var builder = WebApplication.CreateBuilder(args);
 

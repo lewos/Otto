@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Otto.Models;
+using Otto.models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +13,6 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-//app.UseHttpsRedirection();
 
 app.MapGet("/api/stock", async (OttoDbContext db) =>
 {

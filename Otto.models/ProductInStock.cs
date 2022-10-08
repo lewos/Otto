@@ -1,4 +1,4 @@
-﻿namespace Otto.Models
+﻿namespace Otto.models
 {
     public class ProductInStock : IProductInStock
     {
@@ -24,5 +24,7 @@
 
         public int UserId { get; set; }
         public int CompanyId { get; set; }
+        public string? Size { get; set; }
+        public string? Batch { get; set; }
     }
 }

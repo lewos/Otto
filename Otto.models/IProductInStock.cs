@@ -1,4 +1,4 @@
-﻿namespace Otto.Models
+﻿namespace Otto.models
 {
     public interface IProductInStock
     {
@@ -18,6 +18,8 @@
         string? StateDescription { get; set; }
         string? TItemId { get; set; }
         string? TSellerId { get; set; }
+        string? Size { get; set; }
+        string? Batch { get; set; }  
         public int UserId { get; set; }
         public int CompanyId { get; set; }
     }

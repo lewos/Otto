@@ -1,6 +1,6 @@
 using AutoMapper;
 using MediatR;
-using Otto.Models;
+using Otto.models;
 using Otto.users;
 using Otto.users.Services;
 using System.Reflection;
@@ -33,8 +33,6 @@ DBMigrations.PrepOtto(app);
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

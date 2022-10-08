@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Otto.Models;
+using Otto.models;
 using Otto.users.Commands;
 
 namespace Otto.users

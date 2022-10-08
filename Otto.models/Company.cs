@@ -1,4 +1,4 @@
-﻿namespace Otto.Models
+﻿namespace Otto.models
 {
     public class Company
     {
