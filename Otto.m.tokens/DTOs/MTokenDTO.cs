@@ -6,7 +6,7 @@ namespace Otto.m.tokens.DTOs
     {
         public long Id { get; set; }
         [JsonPropertyName("user_id")]
-        public string? UserId { get; set; }
+        public int? UserId { get; set; }
         [JsonPropertyName("business_id")]
         public long? BusinessId { get; set; }
         [JsonPropertyName("m_user_id")]

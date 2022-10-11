@@ -18,7 +18,6 @@ namespace Otto.models
         public long? MUserId { get; set; }
         public long? MOrderId { get; set; }
         public long? MShippingId { get; set; }
-        //public Company Business { get; set; }
         public string ItemDescription { get; set; } = null!;
         public string? SKU { get; set; }
         public string? EAN { get; set; }

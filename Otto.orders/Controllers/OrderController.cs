@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Otto.models;
+using Otto.models.Responses;
 using Otto.orders.DTOs;
 using Otto.orders.Services;
+using System.Net;
 
 namespace Otto.orders.Controllers
 {
@@ -10,11 +12,18 @@ namespace Otto.orders.Controllers
     public class OrderController : ControllerBase
     {
         private readonly OrderService _orderService;
+        private readonly StockService _stockService;
+        private readonly AccessTokenService _accessTokenService;
+        private readonly MercadolibreService _mercadolibreService;
         private readonly MOrdersService _mOrdersService;
 
-        public OrderController(OrderService orderService, MOrdersService mOrdersService)
+        public OrderController(OrderService orderService,StockService stockService, AccessTokenService accessTokenService,
+            MercadolibreService mercadolibreService, MOrdersService mOrdersService)
         {
             _orderService = orderService;
+            _stockService = stockService;
+            _accessTokenService = accessTokenService;
+            _mercadolibreService = mercadolibreService;
             _mOrdersService = mOrdersService;
         }
 
@@ -25,26 +34,189 @@ namespace Otto.orders.Controllers
             return Ok(result);
         }
 
-        [HttpGet("GetPendingOrders")]
-        public async Task<IActionResult> GetPendingOrders()
+        [HttpGet("company/{id}")]
+        public async Task<IActionResult> GetOrdersByCompanyId(int id)
         {
-            var result = await _orderService.GetPendingAsync();
+            var result = await _orderService.GetOrdersAsync(id);
             return Ok(result);
         }
 
-
-        [HttpGet("GetOrderByMOrderId/{id}", Name = "GetOrderByMOrderId")]
-        public async Task<IActionResult> GetOrderByMOrderId(string id)
+        [HttpGet("company/{id}/{state}")]
+        public async Task<IActionResult> GetOrdersByCompanyIdAndState(int id, string state)
         {
-            var result = await _orderService.GetByMOrderIdAsync(id);
-            return result != null ? (IActionResult)Ok(result) : NotFound();
+            if (Enum.TryParse<OrderState>(state, true, out OrderState newState))
+            {
+                var result = await _orderService.GetOrdersAsync(id, newState);
+                return Ok(result);
+            }
+            else
+            {
+                var posibleStates = Enum.GetValues(typeof(OrderState)).Cast<OrderState>()
+                        .Select(d => (d, (int)d))
+                        .ToList();
+
+                return NotFound($"Los estados posibles son: {String.Join(',', posibleStates)}");
+            }
         }
 
-        [HttpGet("GetOrderByPackId/{id}", Name = "GetOrderByPackId")]
-        public async Task<IActionResult> GetOrderByPackId(string id)
+        [HttpGet("company/{id}/pack/{pack}")]
+        public async Task<IActionResult> GetOrdersByCompanyIdAndPakcId(int id, string pack)
         {
-            var result = await _orderService.GetOrderByPackId(id);
-            return result != null ? (IActionResult)Ok(result) : NotFound();
+            var result = await _orderService.GetOrderByPackIdAsync(id, pack);
+            return Ok(result);
+        }
+
+        [HttpPut("company/{id}/pack/{pack}/start")]
+        public async Task<IActionResult> TakeOrderByPackId([FromBody] InProgressDTO dto, int id, string pack)
+        {
+            var result = await _orderService.UpdateOrderInProgressByPackIdAsync(id, pack, dto.UserIdInProgress);
+            if (result.Item2 > 0)
+                return Ok(result.Item1);
+            else
+                return Conflict(result.Item3);
+        }
+
+        [HttpPut("company/{id}/pack/{pack}/stop")]
+        public async Task<IActionResult> StopTakingOrderByPackId([FromBody] InProgressDTO dto, int id, string pack)
+        {
+            var result = await _orderService.UpdateOrderStopInProgressByPackIdAsync(id, pack, dto.UserIdInProgress);
+            if (result.Item2 > 0)
+                return Ok(result.Item1);
+            else
+                return Conflict(result.Item3);
+        }
+
+        [HttpPut("company/{id}/pack/{pack}/end")]
+        public async Task<IActionResult> FinalizeOrderByPackId([FromBody] InProgressDTO dto, int id, string pack)
+        {
+            var result = await _orderService.UpdateFinalizeOrderByPackIdAsync(id, pack, dto.UserIdInProgress);
+            if (result.Item2 > 0)
+            {
+                var itemsInPack = result.Item1;
+
+                var tupleResultProduct = await _stockService.GetProductInStockById((int)itemsInPack.Items.FirstOrDefault().ProductInStockId);
+
+                bool pudoActualizarStock = false;
+
+                if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Mercadolibre")
+                {
+                    foreach (var orderDTO in itemsInPack.Items)
+                    {
+                        // restar stock de la venta finalizada ej "MLA1149237532"
+                        pudoActualizarStock = await _stockService.UpdateQuantityByMItemId(orderDTO.Quantity, orderDTO.ItemId, (int)orderDTO.UserId, (int)orderDTO.CompanyId);
+                    }
+                }
+                else if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Tiendanube")
+                {
+                    foreach (var orderDTO in itemsInPack.Items)
+                    {
+                        // restar stock de la venta finalizada ej "MLA1149237532"
+                        pudoActualizarStock = await _stockService.UpdateQuantityByTItemId(orderDTO.Quantity, orderDTO.ItemId, (int)orderDTO.UserId, (int)orderDTO.CompanyId);
+                    }
+                }
+                if (pudoActualizarStock)
+                    return Ok("Ok");
+                else
+                    return Conflict("No se pudo actualizar la cantidad de del producto en el inventario. Verificar");
+            }
+            return Conflict(result.Item3);
+        }
+
+        //[HttpPost("company/{id}/pack/{pack}/print")]
+        //public async Task<IActionResult> PrintOrderReceiptByPackId([FromBody] InProgressDTO dto, int id, string pack)
+        //{
+        //    var packDto = await _orderService.GetOrderInProgressByPackIdAsync(pack, dto.UserIdInProgress);
+        //    if (packDto?.Items?.Count <= 0)
+        //        return Conflict("No se encontro una orden con ese id");
+            
+        //    var orderDto = packDto.Items.FirstOrDefault();
+            
+        //    var tupleResultProduct = await _stockService.GetProductInStockById((int)orderDto.ProductInStockId);
+        //    if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Mercadolibre")
+        //    {
+        //        //Token accessToken = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
+        //        var accessTokenResponse = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
+
+        //        if (hasTokenExpired(accessTokenResponse.token))
+        //            accessTokenResponse = await _accessTokenService.GetTokenAfterRefresh((long)accessTokenResponse.token.MUserId);
+
+        //        var orderResponse = new MOrderResponse<MOrderDTO>(ResponseCode.ERROR, "", new MOrderDTO());
+
+        //        if (accessTokenResponse.token != null)
+        //        {
+        //            //obtener el link del pdf para imprimir
+        //            var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessTokenResponse.token.AccessToken);
+
+        //            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+        //            response.Content = pdf;
+        //            response.StatusCode = HttpStatusCode.OK;
+        //            return Ok(response);
+
+
+        //            return Ok(pdf);
+
+        //        }
+        //        return Conflict("Error al obtener el token");
+
+        //    }
+        //    else if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Tiendanube")
+        //    {
+        //        //TODO
+        //        return Ok("ver imprimir tienda nube");
+        //    }
+        //    else
+        //        return Conflict("No se encontro el producto dentro del inventario");
+        //}
+
+
+        [HttpGet("company/{id}/pack/{pack}/print/{userInProgress}")]
+        public async Task<HttpResponseMessage> PrintOrderReceiptByPackIdPrueba(int id, string pack, int userInProgress)
+        {
+            var packDto = await _orderService.GetOrderInProgressByPackIdAsync(pack, userInProgress);
+
+            var orderDto = packDto.Items.FirstOrDefault();
+
+            var tupleResultProduct = await _stockService.GetProductInStockById((int)orderDto.ProductInStockId);
+            if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Mercadolibre")
+            {
+                //Token accessToken = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
+                var accessTokenResponse = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
+
+                if (hasTokenExpired(accessTokenResponse.token))
+                    accessTokenResponse = await _accessTokenService.GetTokenAfterRefresh((long)accessTokenResponse.token.MUserId);
+
+                var orderResponse = new MOrderResponse<MOrderDTO>(ResponseCode.ERROR, "", new MOrderDTO());
+
+                if (accessTokenResponse.token != null)
+                {
+                    //obtener el link del pdf para imprimir
+                    var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessTokenResponse.token.AccessToken);
+
+
+                    return pdf;                    
+                }
+            }
+            HttpResponseMessage response2 = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            return response2;
+        }
+
+
+
+        private async Task<Token> GetAccessTokenByMuserId(long mUserId)
+        {
+            var res = await _accessTokenService.GetTokenCacheAsync(mUserId);
+
+            if (hasTokenExpired(res.token))
+                res = await _accessTokenService.GetTokenAfterRefresh(mUserId);
+            return res.token;
+        }
+        private bool hasTokenExpired(Token token)
+        {
+            var utcNow = DateTime.UtcNow;
+            // Si expiro o si esta a punto de expirar
+            if (token.ExpiresAt < utcNow + TimeSpan.FromMinutes(10))
+                return true;
+            return false;
         }
 
         [HttpPost]
@@ -52,97 +224,7 @@ namespace Otto.orders.Controllers
         {
             var result = await _orderService.CreateAsync(order);
             return Created("GetOrder", result.Item1);
-        }
-
-        [HttpPut("TakeOrderByMOrderId/{id}")]
-        public async Task<IActionResult> TakeOrderByMOrderId(string id, [FromBody] InProgressDTO dto)
-        {
-            dto.Id = id;
-            var result = await _orderService.UpdateOrderInProgressByMOrderIdAsync(id, dto.UserIdInProgress);
-            if (result.Item2 > 0)
-                return Ok(result.Item1);
-            else
-                return Conflict("No se encontro una orden con ese id o la misma ya se encuentra tomada por otro operario");
-        }
-
-        [HttpPut("TakeOrderByPackId/{id}")]
-        public async Task<IActionResult> TakeOrderByPackId(string id, [FromBody] InProgressDTO dto)
-        {
-            dto.Id = id;
-            var result = await _orderService.UpdateOrderInProgressByPackIdAsync(id, dto.UserIdInProgress);
-            if (result.Item2 > 0)
-                return Ok(result.Item1);
-            else
-                return Conflict("No se encontro una orden con ese id o la misma ya se encuentra tomada por otro operario");
-        }
-
-        [HttpPut("StopTakingOrderByMOrderId/{id}")]
-        public async Task<IActionResult> StopTakingOrderByMOrderId(string id, [FromBody] InProgressDTO dto)
-        {
-            dto.Id = id;
-            var result = await _orderService.UpdateOrderStopInProgressByMOrderIdAsync(id, dto.UserIdInProgress);
-            if (result.Item2 > 0)
-                return Ok(result.Item1);
-            else
-                return Conflict("No se encontro una orden con ese id o el el id del operario no es el mismo que la tomo o la misma ya se encuentra en un estado final");
-        }
-
-
-        [HttpPut("StopTakingOrderByPackId/{id}")]
-        public async Task<IActionResult> StopTakingOrderByPackId(string id, [FromBody] InProgressDTO dto)
-        {
-            dto.Id = id;
-            var result = await _orderService.UpdateOrderStopInProgressByPackIdAsync(id, dto.UserIdInProgress);
-            if (result.Item2 > 0)
-                return Ok(result.Item1);
-            else
-                return Conflict("No se encontro una orden con ese id o el el id del operario no es el mismo que la tomo o la misma ya se encuentra en un estado final");
-        }
-
-
-        [HttpPut("FinalizeOrderByMOrderId/{id}")]
-        public async Task<IActionResult> FinalizeOrderByMOrderId(string id, [FromBody] InProgressDTO dto)
-        {
-            dto.Id = id;
-            var result = await _mOrdersService.UpdateFinalizeOrderByMOrderIdAsync(id, dto.UserIdInProgress);
-            
-            if (result.Item2 > 0)
-                return Ok(result.Item1);
-            else
-                return Conflict("No se encontro una orden con ese id o el el id del operario no es el mismo que la tomo o la misma ya se encuentra en un estado final");
-        }
-
-
-        [HttpPut("FinalizeOrderByPackId/{id}")]
-        public async Task<IActionResult> FinalizeOrderByPackId(string id, [FromBody] InProgressDTO dto)
-        {
-            dto.Id = id;
-            var result = await _mOrdersService.UpdateFinalizeOrderByPackIdAsync(id, dto.UserIdInProgress);            
-            if (result.Item2 > 0)
-                return Ok(result.Item1);
-            else
-                return Conflict("No se encontro una orden con ese id o el el id del operario no es el mismo que la tomo o la misma ya se encuentra en un estado final");
-        }
-
-        [HttpPost("PrintOrderReceiptByMOrderId/{id}")]
-        public async Task<IActionResult> PrintOrderReceiptByMOrderId(string id, [FromBody] PrintReceiptOrderDTO dto)
-        {
-            dto.Id = id;
-
-            var result = await _mOrdersService.GetPrintOrderAsync(id, dto);
-
-            return Ok(result);            
-        }
-
-        [HttpPost("PrintOrderReceiptByPackId/{id}")]
-        public async Task<IActionResult> PrintOrderReceiptByPackId(string id, [FromBody] PrintReceiptOrderDTO dto)
-        {
-            dto.Id = id;
-
-            var result = await _mOrdersService.GetPrintOrderByPackIdAsync(id, dto);
-
-            return Ok(result);
-        }
+        }       
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Order order)

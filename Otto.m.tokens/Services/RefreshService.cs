@@ -1,6 +1,6 @@
-﻿using Microsoft.Net.Http.Headers;
-using Otto.m.tokens.DTOs;
-using Otto.m.tokens.Models;
+﻿using Otto.m.tokens.DTOs;
+using Otto.models;
+using Otto.models.Responses;
 using System.Text.Json;
 
 namespace Otto.m.tokens.Services
@@ -20,7 +20,7 @@ namespace Otto.m.tokens.Services
 
         }
 
-        public async Task<MRefreshTokenResponse> RefreshToken(long MUserId, string RefreshToken)
+        public async Task<MRefreshTokenResponse<MRefreshTokenDTO>> RefreshToken(long MUserId, string RefreshToken)
         {
             try
             {
@@ -50,16 +50,16 @@ namespace Otto.m.tokens.Services
                     var mToken = await JsonSerializer.DeserializeAsync
                         <MRefreshTokenDTO>(contentStream);
 
-                    return new MRefreshTokenResponse(Response.OK, $"{Response.OK}", mToken);
+                    return new MRefreshTokenResponse<MRefreshTokenDTO>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
 
                 }
 
-                return new MRefreshTokenResponse(Response.WARNING, $"No se obtuvo el refresh token del usuario {MUserId}", null);
+                return new MRefreshTokenResponse<MRefreshTokenDTO>(ResponseCode.WARNING, $"No se obtuvo el refresh token del usuario {MUserId}", null);
 
             }
             catch (Exception ex)
             {
-                return new MRefreshTokenResponse(Response.ERROR, $"Error al obtener el refresh token del usuario {MUserId}. Ex : {ex}", null);
+                return new MRefreshTokenResponse<MRefreshTokenDTO>(ResponseCode.ERROR, $"Error al obtener el refresh token del usuario {MUserId}. Ex : {ex}", null);
 
             }
 

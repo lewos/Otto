@@ -1,4 +1,5 @@
-﻿using Otto.models;
+﻿using Microsoft.EntityFrameworkCore;
+using Otto.models;
 
 namespace Otto.users.Services
 {
@@ -106,6 +107,22 @@ namespace Otto.users.Services
                 return rowsAffected > 0;
             }
         }
+
+        public async Task<bool> UpdateTokenUserIdByMUserIdAsync(int userId, long mUserId)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var token = await db.Tokens.Where(t=> t.MUserId == mUserId).FirstOrDefaultAsync();
+                if(token ==null)
+                    return false;
+                token.UserId = userId;
+                var rowsAffected = await db.SaveChangesAsync();
+                return rowsAffected > 0;
+            }
+        }
+
+
+
         public async Task<bool> DeleteUserAsync(long id)
         {
             using (var db = new OttoDbContext())
@@ -132,5 +149,6 @@ namespace Otto.users.Services
             if (!string.IsNullOrEmpty((user.MUserId)))
                 inDBUser.MUserId = inDBUser.MUserId != user.MUserId ? user.MUserId : inDBUser.MUserId;
         }
+
     }
 }

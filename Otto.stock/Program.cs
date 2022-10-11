@@ -27,16 +27,7 @@ app.MapGet("/api/stock/{id}", async (OttoDbContext db, int id) =>
     return null;
 });
 
-app.MapGet("/api/stock/GetStockOfSellerById/{id}", async (OttoDbContext db, string id) =>
-{
-    var products = await db.ProductsInStock.Where(s => s.SellerId == id).ToListAsync();
-    if (products is not null)
-        return products;
-    return null;
-});
-
-
-app.MapGet("/api/stock/GetStockOfSellerByMUserId/{id}", async (OttoDbContext db, string id) =>
+app.MapGet("/api/stock/MUserId/{id}", async (OttoDbContext db, string id) =>
 {
     var items = await db.ProductsInStock.Where(s => s.MSellerId == id).ToListAsync();
     if (items is not null)
@@ -44,7 +35,15 @@ app.MapGet("/api/stock/GetStockOfSellerByMUserId/{id}", async (OttoDbContext db,
     return null;
 });
 
-app.MapGet("/api/stock/GetStockOfSellerByMItemId/{id}", async (OttoDbContext db, string id) =>
+app.MapGet("/api/stock/TUserId/{id}", async (OttoDbContext db, string id) =>
+{
+    var items = await db.ProductsInStock.Where(s => s.TSellerId == id).ToListAsync();
+    if (items is not null)
+        return items;
+    return null;
+});
+
+app.MapGet("/api/stock/MItemId/{id}", async (OttoDbContext db, string id) =>
 {
     var item = await db.ProductsInStock.Where(s => s.MItemId == id).FirstOrDefaultAsync();
     if (item is not null)
@@ -52,18 +51,62 @@ app.MapGet("/api/stock/GetStockOfSellerByMItemId/{id}", async (OttoDbContext db,
     return null;
 });
 
-app.MapGet("/api/stock/GetPendingStock", async (OttoDbContext db) =>
+app.MapGet("/api/stock/TItemId/{id}", async (OttoDbContext db, string id) =>
 {
-    var items = await db.ProductsInStock.Where(s => s.State == State.Pendiente).ToListAsync();
-    if (items is not null)
-        return items;
+    var item = await db.ProductsInStock.Where(s => s.TItemId == id).FirstOrDefaultAsync();
+    if (item is not null)
+        return item;
     return null;
 });
 
+app.MapGet("/api/stock/company/{id}", async (OttoDbContext db, int id) =>
+{
+    var products = await db.ProductsInStock.Where(s => s.CompanyId == id).ToListAsync();
+    if (products is not null)
+        return products;
+    return null;
+});
 
+app.MapGet("/api/stock/user/{id}", async (OttoDbContext db, int id) =>
+{
+    var products = await db.ProductsInStock.Where(s => s.UserId == id).ToListAsync();
+    if (products is not null)
+        return products;
+    return null;
+});
 
 app.MapPost("/api/stock", async (OttoDbContext db, ProductInStock request) =>
 {
+    //check if userId exist
+    var user = await db.Users.Where(u => u.Id == request.UserId).FirstOrDefaultAsync();
+    if (user is null)
+        return Results.Conflict("El usuario no existe");
+
+    //check if companyId exist
+    var company = await db.Companies.Where(c => c.Id == request.CompanyId).FirstOrDefaultAsync();
+    if (company is null)
+        return Results.Conflict("El fullfilment no existe");
+
+    //check if user belongs in that company
+    if (user.CompanyId != company.Id)
+        return Results.Conflict("El usuario no se encuentra dentro de este fullfilment");
+
+    //if origin is Mercadolibre, get user search mUserId
+    if (!string.IsNullOrEmpty(request.Origin) && request.Origin.Equals("Mercadolibre") && !string.IsNullOrEmpty(user.MUserId)) 
+    {
+        request.MSellerId = user.MUserId;
+        request.UserIdMail = user.Mail;
+    }
+    else if (!string.IsNullOrEmpty(request.Origin) && request.Origin.Equals("Tiendanube") && !string.IsNullOrEmpty(user.TUserId))
+    {
+        request.TSellerId = user.TUserId;
+        request.UserIdMail = user.Mail;
+    }
+    else
+        return Results.Conflict("El canal de venta no esta habilitado o el usuario no posee los permisos para ese canal. Los canales habilitados son Mercadolibre, Tiendanube ");
+
+    //TODO  if same user, company, location and item id and seller, updatequantity
+
     await db.ProductsInStock.AddAsync(request);
     await db.SaveChangesAsync();
     return Results.Created($"/api/stock/{request.Id}", request);
@@ -78,9 +121,9 @@ app.MapPut("/api/stock/{id}", async (OttoDbContext db, ProductInStock request, i
     return Results.NoContent();
 });
 
-app.MapPut("/api/stock/UpdateQuantityByMItemId/{id}", async (OttoDbContext db, UpdateQuantityDTO dto, string id) =>
+app.MapPut("/api/stock/UpdateQuantityById/{id}", async (OttoDbContext db, UpdateQuantityDTO dto, int id) =>
 {
-    var stock = await db.ProductsInStock.Where(s => s.MItemId == id).FirstOrDefaultAsync();
+    var stock = await db.ProductsInStock.Where(s => s.Id == id).FirstOrDefaultAsync();
     if (stock is null) return Results.NotFound();
     UpdateQuantity(dto.Quantity, stock);
     await db.SaveChangesAsync();
@@ -109,8 +152,8 @@ static void UpdateFields(ProductInStock request, ProductInStock? stock)
     stock.Description = request.Description;
     stock.Quantity = request.Quantity;
     stock.Origin = request.Origin;
-    stock.SellerId = request.SellerId;
-    stock.SellerIdMail = request.SellerIdMail;
+    stock.UserId = request.UserId;
+    stock.UserIdMail = request.UserIdMail;
     stock.MSellerId = request.MSellerId;
     stock.TSellerId = request.TSellerId;
     stock.MItemId = request.MItemId;

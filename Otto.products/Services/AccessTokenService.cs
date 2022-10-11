@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Net.Http.Headers;
 using Otto.models;
 using Otto.models.Responses;
+using System.IO;
+using System.Text.Json;
 
 namespace Otto.products.Services
 {
@@ -45,17 +48,46 @@ namespace Otto.products.Services
 
                 return new MAccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
             }
-        }        
+        }
 
         public async Task<MAccessTokenResponse<Token>> GetTokenAfterRefresh(long MUserId)
         {
-            using (var db = new OttoDbContext())
+            try
             {
-                var mToken = await db.Tokens.Where(t => t.MUserId == MUserId).FirstOrDefaultAsync();
-                if (mToken is null)
-                    return new MAccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario {MUserId}", null);
+                //Deberia estar en una variable de entorno
+                string baseUrl = Environment.GetEnvironmentVariable("URL_OTTO_TOKENS"); ;
+                string endpoint = "api/MTokens/RefreshByMUserId";
+                string url = string.Join('/', baseUrl, endpoint, MUserId);
 
-                return new MAccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
+                var httpRequestMessage = new HttpRequestMessage(
+                    HttpMethod.Get, url)
+                {
+                    Headers =
+                    {
+                        { HeaderNames.Accept, "*/*" },
+                    }
+                };
+
+                var httpClient = _httpClientFactory.CreateClient();
+                var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    using var contentStream =
+                        await httpResponseMessage.Content.ReadAsStreamAsync();
+
+                    var mToken = await JsonSerializer.DeserializeAsync
+                        <Token>(contentStream);
+
+                    return new MAccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
+                }
+                //si no lo encontro, verificar en donde leo la respuesta del servicio
+                return new MAccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario {MUserId}", null);
+            }
+            catch (Exception ex)
+            {
+                //verificar en donde leo la respuesta del servicio
+                return new MAccessTokenResponse<Token>(ResponseCode.ERROR, $"Error al obtener el token del usuario {MUserId}. Ex : {ex}", null);
             }
         }
 

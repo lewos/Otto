@@ -1,11 +1,11 @@
-using Otto.m.tokens.Models;
 using Otto.m.tokens.Services;
+using Otto.models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<MTokenService>();
-builder.Services.AddDbContext<OttoContext>();
+builder.Services.AddDbContext<OttoDbContext>();
 
 builder.Services.AddScoped<RefreshService>();
 builder.Services.AddHttpClient();

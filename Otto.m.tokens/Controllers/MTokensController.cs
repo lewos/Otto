@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Otto.m.tokens.DTOs;
-using Otto.m.tokens.Models;
 using Otto.m.tokens.Services;
+using Otto.models;
 
 namespace Otto.m.tokens.Controllers
 {
@@ -15,10 +10,10 @@ namespace Otto.m.tokens.Controllers
     [ApiController]
     public class MTokensController : ControllerBase
     {
-        private readonly OttoContext _context;
+        private readonly OttoDbContext _context;
         private readonly MTokenService _service;
 
-        public MTokensController(OttoContext context, MTokenService service)
+        public MTokensController(OttoDbContext context, MTokenService service)
         {
             _context = context;
             _service = service;
@@ -27,9 +22,9 @@ namespace Otto.m.tokens.Controllers
 
         // GET: api/MTokens
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MTokenDTO>>> GetMTokens()
+        public async Task<ActionResult<IEnumerable<Token>>> GetMTokens()
         {
-            if (_context.MTokens == null)
+            if (_context.Tokens == null)
             {
                 return NotFound();
             }
@@ -39,13 +34,13 @@ namespace Otto.m.tokens.Controllers
 
         // GET: api/MTokens/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MToken>> GetMToken(long id)
+        public async Task<ActionResult<Token>> GetMToken(long id)
         {
-            if (_context.MTokens == null)
+            if (_context.Tokens == null)
             {
                 return NotFound();
             }
-            var mToken = await _context.MTokens.FindAsync(id);
+            var mToken = await _context.Tokens.FindAsync(id);
 
             if (mToken == null)
             {
@@ -58,7 +53,7 @@ namespace Otto.m.tokens.Controllers
 
         // GET: api/MTokens/ByMUserId/5
         [HttpGet("ByMUserId/{id}")]
-        public async Task<ActionResult<MTokenDTO>> GetMTokenByUser(long id)
+        public async Task<ActionResult<Token>> GetMTokenByUser(long id)
         {
             var mToken = await _service.GetMTokenByUserAsync(id);
 
@@ -73,7 +68,7 @@ namespace Otto.m.tokens.Controllers
 
         // POST: api/MTokens/RefreshByMUserId/5
         [HttpGet("RefreshByMUserId/{id}")]
-        public async Task<ActionResult<MTokenDTO>> RefreshByUser(long id) 
+        public async Task<ActionResult<Token>> RefreshByUser(long id) 
         {
             var mToken = await _service.RefreshMTokenByUserAsync(id);
 
@@ -82,24 +77,24 @@ namespace Otto.m.tokens.Controllers
                 return NotFound();
             }
 
-            return mToken;
+            return Ok(mToken);
         }
 
 
         // PUT: api/MTokens/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMToken(long id, MTokenDTO mToken)
+        public async Task<IActionResult> PutMToken(long id, Token token)
         {
 
-            if (id != mToken.Id)
+            if (id != token.Id)
             {
                 return BadRequest();
             }
 
             try
             {
-                var rowsAffected = await _service.UpdateAsync(id,mToken);
+                var rowsAffected = await _service.UpdateAsync(id,token);
                 return Update(rowsAffected);
 
             }
@@ -127,18 +122,18 @@ namespace Otto.m.tokens.Controllers
         // POST: api/MTokens
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<IActionResult> PostMToken(MTokenDTO dto)
+        public async Task<IActionResult> PostMToken(Token requestToken)
         {
-            if (_context.MTokens == null)
+            if (_context.Tokens == null)
             {
                 return Problem("Entity set 'OttoContext.MTokens'  is null.");
             }
 
             // Si ya existe un token con ese mismo usuario, hago el update
-            var token = await _context.MTokens.Where(t => t.MUserId == dto.MUserId).FirstOrDefaultAsync();
-            if (token != null && token.MUserId == dto.MUserId)
+            var token = await _context.Tokens.Where(t => t.MUserId == requestToken.MUserId).FirstOrDefaultAsync();
+            if (token != null && token.MUserId == requestToken.MUserId)
             {
-                var tuple = await _service.UpdateWithMTokenIdAsync(dto);
+                var tuple = await _service.UpdateWithMTokenIdAsync(requestToken);
                 var newDTO = tuple.Item1;
                 var rowsAffected = tuple.Item2;
                 if (rowsAffected > 0)
@@ -148,7 +143,7 @@ namespace Otto.m.tokens.Controllers
             }
             else
             {
-                var tuple = await _service.Create(dto);
+                var tuple = await _service.Create(requestToken);
                 var newDTO = tuple.Item1;
                 return CreatedAtAction("GetMToken", new { id = newDTO.Id }, newDTO);
 
@@ -159,17 +154,17 @@ namespace Otto.m.tokens.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMToken(long id)
         {
-            if (_context.MTokens == null)
+            if (_context.Tokens == null)
             {
                 return NotFound();
             }
-            var mToken = await _context.MTokens.FindAsync(id);
+            var mToken = await _context.Tokens.FindAsync(id);
             if (mToken == null)
             {
                 return NotFound();
             }
 
-            _context.MTokens.Remove(mToken);
+            _context.Tokens.Remove(mToken);
             await _context.SaveChangesAsync();
 
             return Ok();
@@ -177,7 +172,7 @@ namespace Otto.m.tokens.Controllers
 
         private bool MTokenExists(long id)
         {
-            return (_context.MTokens?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Tokens?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 

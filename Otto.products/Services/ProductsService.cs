@@ -38,7 +38,7 @@ namespace Otto.products.Services
 
                         // ahora tengo que chequear si ya tengo algo de eso en el deposito/stock
 
-                        var stockResponse = await _stockService.GetStockByMUserIdAsync(long.Parse(id));
+                        var stockResponse = await _stockService.GetStockByMUserIdAsync(id);
 
                         if (stockResponse.res == ResponseCode.OK) 
                         {

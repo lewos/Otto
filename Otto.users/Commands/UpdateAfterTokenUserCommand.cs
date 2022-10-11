@@ -40,8 +40,9 @@ namespace Otto.users.Commands
             }
 
             var res = await _userService.UpdateUserAsync(request.Id, user);
+            var res2 = await _userService.UpdateTokenUserIdByMUserIdAsync(user.Id, int.Parse(user.MUserId));
             //var officesResponse = _mapperMapOfficesDtosToOfficesResponse(officesDtos);
-            return res;
+            return res && res2;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Net.Http.Headers;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using Otto.models;
 using Otto.models.Responses;
 using Otto.products.DTO;
@@ -15,53 +16,15 @@ namespace Otto.products.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<StockResponse<StockDTO>> GetStockByMUserIdAsync(long MUserId)
+        public async Task<StockResponse<ProductInStock>> GetStockByMUserIdAsync(string MUserId)
         {
-            try
+            using (var db = new OttoDbContext())
             {
-                //Deberia estar dentro de una variable de entorno
-                string baseUrl = "http://ottostocks.herokuapp.com";
-                string endpoint = $"api/stock/GetStockOfSellerByMUserId/{MUserId}";
-                string url = string.Join('/', baseUrl, endpoint);
-
-
-                var httpRequestMessage = new HttpRequestMessage(
-                    HttpMethod.Get, url)
-                {
-                    Headers =
-                    {
-                        { HeaderNames.Accept, "*/*" },
-                    }
-                };
-
-                var httpClient = _httpClientFactory.CreateClient();
-                var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-                if (httpResponseMessage.IsSuccessStatusCode)
-                {
-                    using var contentStream =
-                        await httpResponseMessage.Content.ReadAsStreamAsync();
-
-                    var listStockDTO = await JsonSerializer.DeserializeAsync
-                        <List<StockDTO>>(contentStream);
-
-                    return new StockResponse<StockDTO>(ResponseCode.OK, $"{ResponseCode.OK}", listStockDTO);
-
-                }
-
-                //si no lo encontro, verificar en donde leo la respuesta del servicio
-                return new StockResponse<StockDTO>(ResponseCode.WARNING, $"Ocurrio un error al consulat el stock del usuario con el id {MUserId}", null);
-
-
+                var productsInStock = await db.ProductsInStock.Where(p => p.MSellerId == MUserId).ToListAsync();
+                if(productsInStock is not null)
+                    return new StockResponse<ProductInStock>(ResponseCode.OK, $"{ResponseCode.OK}", productsInStock);                
+                return new StockResponse<ProductInStock>(ResponseCode.WARNING, $"Ocurrio un error al consular el stock del usuario con el id {MUserId}", null);
             }
-            catch (Exception ex)
-            {
-                //verificar en donde leo la respuesta del servicio
-                return new StockResponse<StockDTO>(ResponseCode.ERROR, $"Error al obtener el stock del usuario con id {MUserId}. Ex : {ex}", null);
-
-            }
-
-
         }
     }
 }

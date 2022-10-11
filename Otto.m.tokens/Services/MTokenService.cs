@@ -1,57 +1,58 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Otto.m.tokens.DTOs;
 using Otto.m.tokens.Mapper;
-using Otto.m.tokens.Models;
+using Otto.models;
 
 namespace Otto.m.tokens.Services
 {
     public class MTokenService
     {
 
-        private readonly OttoContext _context;
+        private readonly OttoDbContext _context;
         private readonly RefreshService _refreshService;
 
-        public MTokenService(OttoContext context, RefreshService refreshService)
+        public MTokenService(OttoDbContext context, RefreshService refreshService)
         {
             _context = context;
             _refreshService = refreshService;
         }
 
-        public async Task<List<MTokenDTO>> GetAsync()
+        public async Task<List<Token>> GetAsync()
         {
-            var response = new List<MTokenDTO>();
-            var tokens = await _context.MTokens.ToListAsync();
-            foreach (var token in tokens)
-                response.Add(MTokenMapper.GetMTokenDTO(token));
+            var response = new List<Token>();
+            var tokens = await _context.Tokens.ToListAsync();
+            //foreach (var token in tokens)
+            //    response.Add(token);
 
-            return response;
+            //return response;
 
+            return tokens;
         }
 
-        public async Task<MTokenDTO> GetMTokenByUserAsync(long id)
+        public async Task<Token> GetMTokenByUserAsync(long id)
         {
 
-            var token = await _context.MTokens.Where(t => t.MUserId == id).FirstOrDefaultAsync();
+            var token = await _context.Tokens.Where(t => t.MUserId == id).FirstOrDefaultAsync();
             if (token != null)
             {
-                return MTokenMapper.GetMTokenDTO(token);
+                return token;
             }
 
             return null;
         }
 
 
-        public async Task<MTokenDTO> RefreshMTokenByUserAsync(long id)
+        public async Task<Token> RefreshMTokenByUserAsync(long id)
         {
 
-            var token = await _context.MTokens.Where(t => t.MUserId == id).FirstOrDefaultAsync();
+            var token = await _context.Tokens.Where(t => t.MUserId == id).FirstOrDefaultAsync();
             if (token != null)
             {
                 // Llamar al servicio para hacer el refresh
                 var response = await _refreshService.RefreshToken((long)token.MUserId, token.RefreshToken);
 
                 // hacer el update en la base
-                if (response.res == Response.OK)
+                if (response.res == ResponseCode.OK)
                 {
                     UpdateTokenProperties(response.token, token);
                     UpdateDateTimeKindForPostgress(token);
@@ -73,7 +74,8 @@ namespace Otto.m.tokens.Services
                 }
 
                 // devolver el token
-                return MTokenMapper.GetMTokenDTO(token);
+                //return MTokenMapper.GetMTokenDTO(token);
+                return token;
             }
 
             Console.WriteLine($"El token de ese usuario no esta en la base {id}");
@@ -91,10 +93,10 @@ namespace Otto.m.tokens.Services
         /// <param name="id"></param>
         /// <param name="mToken"></param>
         /// <returns>number of rows affected</returns>
-        public async Task<int> UpdateAsync(long id, MTokenDTO dto)
+        public async Task<int> UpdateAsync(long id, Token dto)
         {
             // Si ya existe un token con ese mismo usuario, hago el update
-            var token = await _context.MTokens.Where(t => t.Id == id).FirstOrDefaultAsync();
+            var token = await _context.Tokens.Where(t => t.Id == id).FirstOrDefaultAsync();
             if (token != null)
             {
                 UpdateTokenProperties(dto, token);
@@ -111,10 +113,10 @@ namespace Otto.m.tokens.Services
         /// </summary>
         /// <param name="mToken"></param>
         /// <returns>number of rows affected</returns>
-        public async Task<Tuple<MTokenDTO, int>> UpdateWithMTokenIdAsync(MTokenDTO dto)
+        public async Task<Tuple<Token, int>> UpdateWithMTokenIdAsync(Token dto)
         {
             // Si ya existe un token con ese mismo usuario, hago el update
-            var token = await _context.MTokens.Where(t => t.MUserId == dto.MUserId).FirstOrDefaultAsync();
+            var token = await _context.Tokens.Where(t => t.MUserId == dto.MUserId).FirstOrDefaultAsync();
             if (token != null && token.MUserId == dto.MUserId)
             {
                 UpdateTokenProperties(dto, token);
@@ -125,13 +127,13 @@ namespace Otto.m.tokens.Services
             _context.Entry(token).State = EntityState.Modified;
             var rowsAffected = await _context.SaveChangesAsync();
 
-            var newDTO = MTokenMapper.GetMTokenDTO(token);
+            //var newDTO = MTokenMapper.GetMTokenDTO(token);
 
-            return new Tuple<MTokenDTO, int>(newDTO, rowsAffected);
+            return new Tuple<Token, int>(token, rowsAffected);
 
         }
 
-        private static void UpdateTokenProperties(MTokenDTO dto, MToken? token)
+        private static void UpdateTokenProperties(Token dto, Token? token)
         {
             var utcNow = DateTime.UtcNow;
 
@@ -141,7 +143,7 @@ namespace Otto.m.tokens.Services
             token.ExpiresAt = utcNow + TimeSpan.FromSeconds((double)dto.ExpiresIn);
         }
 
-        private static void UpdateTokenProperties(MRefreshTokenDTO dto, MToken? token)
+        private static void UpdateTokenProperties(MRefreshTokenDTO dto, Token? token)
         {
             var utcNow = DateTime.UtcNow;
 
@@ -153,7 +155,7 @@ namespace Otto.m.tokens.Services
 
 
 
-        private static void UpdateDateTimeKindForPostgress(MToken token) 
+        private static void UpdateDateTimeKindForPostgress(Token token) 
         {
             token.Created = DateTime.SpecifyKind((DateTime) token.Created, DateTimeKind.Utc);
             token.Modified = DateTime.SpecifyKind((DateTime) token.Modified, DateTimeKind.Utc);
@@ -167,24 +169,24 @@ namespace Otto.m.tokens.Services
         /// </summary>
         /// <param name="mToken"></param>
         /// <returns>ID and number of rows affected</returns>
-        public async Task<Tuple<MTokenDTO, int>> Create(MTokenDTO dto)
+        public async Task<Tuple<Token, int>> Create(Token token)
         {
             var utcNow = DateTime.UtcNow;
 
-            var mToken = MTokenMapper.GetMToken(dto);
+            //var mToken = MTokenMapper.GetMToken(token);
 
-            mToken.Created = utcNow;
-            mToken.Modified = utcNow;
-            mToken.Active = true;
-            mToken.ExpiresAt = utcNow + TimeSpan.FromSeconds((double)dto.ExpiresIn);
+            token.Created = utcNow;
+            token.Modified = utcNow;
+            token.Active = true;
+            token.ExpiresAt = utcNow + TimeSpan.FromSeconds((double)token.ExpiresIn);
 
-            _context.MTokens.Add(mToken);
+            _context.Tokens.Add(token);
             var rowsAffected = await _context.SaveChangesAsync();
 
 
-            var newDTO = MTokenMapper.GetMTokenDTO(mToken);
+            //var newDTO = MTokenMapper.GetMTokenDTO(token);
 
-            return new Tuple<MTokenDTO, int>(newDTO, rowsAffected);
+            return new Tuple<Token, int>(token, rowsAffected);
 
         }
 

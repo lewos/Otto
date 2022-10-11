@@ -12,50 +12,64 @@ namespace Otto.orders.Services
         {
             _httpClientFactory = httpClientFactory;
         }
-       
-        //public async Task<bool> UpdateQuantity(UpdateQuantityDTO dto)
-        //{
-        //    try
-        //    {
-        //        //Deberia estar en una variable de entorno
-        //        string baseUrl = "http://ottostocks.herokuapp.com";
-        //        string endpoint = $"api/stock/UpdateQuantityByMItemId/{dto.MItemId}";
-        //        string url = string.Join('/', baseUrl, endpoint);
 
-        //        var json = JsonSerializer.Serialize(dto);
-        //        var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //        var httpClient = _httpClientFactory.CreateClient();
-        //        var httpResponseMessage = await httpClient.PostAsync(url, data);
-
-        //        if (httpResponseMessage.IsSuccessStatusCode)
-        //        {
-        //            return true;
-        //        }
-
-        //        //si no lo encontro, verificar en donde leo la respuesta del servicio
-        //        Console.WriteLine($"No se puedo actualizar la cantidad el stock del item {dto.MItemId}");
-        //        return false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        //verificar en donde leo la respuesta del servicio                
-        //        Console.WriteLine($"Error al actualizar la cantidad el stock del item {dto.MItemId}. Ex : {ex}");
-        //        return false;
-        //    }
-        //}
-
-        public async Task<bool> UpdateQuantity(UpdateQuantityDTO dto) 
+        public async Task<bool> UpdateQuantityByMItemId(int quantity ,string mItemId , int userId, int companyId) 
         {
             using (var db = new OttoDbContext())
             {
-                var productInStock = await db.ProductsInStock.Where(p => p.MItemId == dto.MItemId).FirstOrDefaultAsync();
-                productInStock.Quantity = dto.Quantity;
+                var productInStock = await db.ProductsInStock.Where(p => p.MItemId == mItemId &&
+                                                                         p.UserId == userId &&
+                                                                         p.CompanyId == companyId).FirstOrDefaultAsync();
+
+                productInStock.Quantity = productInStock.Quantity - quantity;
                 var rowsAffected = await db.SaveChangesAsync();
                 if(rowsAffected > 0)
                     return true;
                 return false;
             }
         }
+
+        public async Task<bool> UpdateQuantityByTItemId(int quantity, string tItemId, int userId, int companyId)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var productInStock = await db.ProductsInStock.Where(p => p.TItemId == tItemId &&
+                                                                         p.UserId == userId &&
+                                                                         p.CompanyId == companyId).FirstOrDefaultAsync();
+
+                productInStock.Quantity = productInStock.Quantity - quantity;
+                var rowsAffected = await db.SaveChangesAsync();
+                if (rowsAffected > 0)
+                    return true;
+                return false;
+            }
+        }
+
+        public async Task<Tuple<bool,int>> GetProductInStockByMItemId(string mItemId, int userId)
+        {
+
+            using (var db = new OttoDbContext())
+            {
+                var productInStock = await db.ProductsInStock.Where(p => p.MItemId == mItemId && 
+                                                                         p.UserId == userId).FirstOrDefaultAsync();
+                if (productInStock is null)
+                    return new Tuple<bool, int>(false, 0);
+                return new Tuple<bool, int>(true,productInStock.Id);
+            }
+        }
+
+
+        public async Task<Tuple<bool, ProductInStock>> GetProductInStockById(int id)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var productInStock = await db.ProductsInStock.Where(p => p.Id == id).FirstOrDefaultAsync();
+                if (productInStock is null)
+                    return new Tuple<bool, ProductInStock>(false, null);
+                return new Tuple<bool, ProductInStock>(true, productInStock);
+            }
+        }
+
+
     }
 }

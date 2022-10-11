@@ -1,14 +1,14 @@
-﻿namespace Otto.orders.DTOs
+﻿using Otto.models;
+
+namespace Otto.orders.DTOs
 {
     public class PackDTO
     {
-        public string MOrderId { get; set; }
         public string PackId { get; set; }
-        public List<OrderDTO> Items { get; set; }
+        public List<Order> Items { get; set; }
 
-        public PackDTO(string id, string packId, List<OrderDTO> items)
+        public PackDTO(string packId, List<Order> items)
         {
-            MOrderId = id;
             PackId = packId;
             Items = items;
         }

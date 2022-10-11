@@ -89,11 +89,11 @@ namespace Otto.orders.Services
                 state = OrderState.Cancelada;
 
             // Buscar ese usuario id
-            var user = await GetUser(order.Seller.Id);
+            var user = await GetUser(order.Seller.Id.ToString());
 
             var newOrder = new Order
             {
-                UserId = int.Parse(user.Id),
+                UserId = user.Id,
                 MUserId = order.Seller.Id,
                 MOrderId = order.Id,
                 MShippingId = order.Shipping.Id,
@@ -114,84 +114,6 @@ namespace Otto.orders.Services
             Console.WriteLine($"Cantidad de filas afectadas {algo.Item2}");
             return algo.Item2;
         }
-
-        public async Task<Tuple<OrderDTO, int>> UpdateFinalizeOrderByMOrderIdAsync(string id, int userIdInProgress)
-        {
-            var result = await _orderService.UpdateFinalizeOrderByMOrderIdAsync(id, userIdInProgress);
-            if (result.Item2 > 0) 
-            {
-                var orderDTO = result.Item1;
-                // restar stock de la venta finalizada ej "MLA1149237532"
-                var pudoActualizarStock = await _stockService.UpdateQuantity(new UpdateQuantityDTO(orderDTO.Quantity,orderDTO.ItemId));
-            }
-            return result;
-        }
-
-        public async Task<Tuple<PackDTO, int>> UpdateFinalizeOrderByPackIdAsync(string id, int userIdInProgress)
-        {
-            var result = await _orderService.UpdateFinalizeOrderByPackIdAsync(id, userIdInProgress);
-            if (result.Item2 > 0)
-            {
-                var itemsInPack = result.Item1;
-                foreach (var orderDTO in itemsInPack.Items) 
-                {
-                    // restar stock de la venta finalizada ej "MLA1149237532"
-                    var pudoActualizarStock = await _stockService.UpdateQuantity(new UpdateQuantityDTO(orderDTO.Quantity, orderDTO.ItemId));
-                }
-            }
-            return result;
-        }
-
-
-        public async Task<string> GetPrintOrderAsync(string id, PrintReceiptOrderDTO dto)
-        {
-            var orderDto = await _orderService.GetOrderInProgressByMOrderIdAsync(id, dto.UserIdInProgress);
-
-            if (orderDto != null)
-            {
-
-                Token accessToken = await GetAccessToken((long)orderDto.MUserId);
-
-                var orderResponse = new MOrderResponse<MOrderDTO>(ResponseCode.ERROR, "", new MOrderDTO());
-
-                if (accessToken != null)
-                {
-                    //obtener el link del pdf para imprimir
-                    var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessToken.AccessToken);
-
-                    return pdf;
-
-                }
-            }
-            return "No se encontro una orden con ese id o no se pudo obtener el token";
-        }
-
-
-        public async Task<string> GetPrintOrderByPackIdAsync(string id, PrintReceiptOrderDTO dto)
-        {
-            var packDto = await _orderService.GetOrderInProgressByPackIdAsync(id, dto.UserIdInProgress);
-
-            if (packDto != null && packDto.Items.Count > 0)
-            {
-                var orderDto = packDto.Items.FirstOrDefault();
-                if (orderDto != null) 
-                {
-                    Token accessToken = await GetAccessToken((long)orderDto.MUserId);
-
-                    var orderResponse = new MOrderResponse<MOrderDTO>(ResponseCode.ERROR, "", new MOrderDTO());
-
-                    if (accessToken != null)
-                    {
-                        //obtener el link del pdf para imprimir
-                        var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessToken.AccessToken);
-
-                        return pdf;
-
-                    }
-                }
-            }
-            return "No se encontro una orden con ese id o no se pudo obtener el token";
-        }
         private async Task<MOrderDTO> GetMOrder(MOrderNotificationDTO dto)
         {
             //Buscar el accessToken de ese usuario
@@ -209,7 +131,7 @@ namespace Otto.orders.Services
                 : null;
 
         }
-        private async Task<UserDTO> GetUser(long MUserId)
+        private async Task<User> GetUser(string MUserId)
         {
             var userResponse = await _userService.GetUserByMIdCacheAsync(MUserId);
             return userResponse.res == ResponseCode.OK
@@ -217,6 +139,14 @@ namespace Otto.orders.Services
                 : null;
 
         }
+        private async Task<int> GetProductInStockByMItemId(string mItemId, int userId)
+        {
+            var tupleStockResponse = await _stockService.GetProductInStockByMItemId(mItemId, userId);
+            if (tupleStockResponse.Item1)
+                return tupleStockResponse.Item2;
+            return 0;
+        }
+
         private async Task<bool> isNewOrder(MOrderNotificationDTO dto)
         {
             try
@@ -250,20 +180,31 @@ namespace Otto.orders.Services
         private async Task<int> CreateOrder(MOrderDTO order)
         {
             // Buscar ese usuario id
-            var user = await GetUser(order.Seller.Id);
+            var user = await GetUser(order.Seller.Id.ToString());
+
+            //Buscar ese producto en el stock
+            int productInStockId = await GetProductInStockByMItemId(order?.OrderItems[0].Item.Id, user.Id);
+
+            //El producto no esta en stock
+            if (productInStockId == 0) 
+            {
+                Console.WriteLine($"El producto {order?.OrderItems[0].Item.Id} no se encuentra en stock para el usuario {user?.Id}");
+                return 0;
+            }
 
             var utcNow = DateTime.UtcNow;
             var newOrder = new Order
             {
-                UserId = user?.Id == null ? 0 : int.Parse(user.Id),
+                UserId = user?.Id == null ? 0 : user.Id,
                 MUserId = order?.Seller?.Id == null ? null : order.Seller.Id,
                 MOrderId = order?.Id == null ? null : order.Id,
                 MShippingId = order.Shipping?.Id == null ? null : order.Shipping.Id,
-                //BusinessId
+                CompanyId = user?.CompanyId == null ? null : user.CompanyId,                
+                ProductInStockId = productInStockId == 0? null : productInStockId,
                 ItemId = order?.OrderItems[0].Item.Id == null ? null : order.OrderItems[0].Item.Id,
                 ItemDescription = order?.OrderItems[0].Item.Title == null ? null : order.OrderItems[0].Item.Title,
                 Quantity = order.OrderItems[0].Quantity,
-                PackId = order.PackId == null ? null : order.PackId.ToString(),
+                PackId = order.PackId == null ? "Otto-M-" + Guid.NewGuid().ToString("n") : order.PackId.ToString(),
                 SKU = order.OrderItems[0].Item.SellerSku == null ? null : order.OrderItems[0].Item.SellerSku,
                 State = OrderState.Pendiente,
                 ShippingStatus = State.Pendiente,
@@ -284,6 +225,7 @@ namespace Otto.orders.Services
                 return 0;
             }
         }
+
         private async Task<Token> GetAccessToken(MOrderNotificationDTO dto)
         {
             var res = await _accessTokenService.GetTokenCacheAsync((long)dto.MUserId);
@@ -292,7 +234,7 @@ namespace Otto.orders.Services
                 res = await _accessTokenService.GetTokenAfterRefresh((long)dto.MUserId);
             return res.token;
         }
-        private async Task<Token> GetAccessToken(long mUserId)
+        private async Task<Token> GetAccessTokenByMuserId(long mUserId)
         {
             var res = await _accessTokenService.GetTokenCacheAsync(mUserId);
 
@@ -315,7 +257,7 @@ namespace Otto.orders.Services
             string appId = Environment.GetEnvironmentVariable("APP_ID");
 
             //Buscar el accessToken de ese usuario
-            Token accessToken = await GetAccessToken(mUserId);
+            Token accessToken = await GetAccessTokenByMuserId(mUserId);
 
             var mUnreadNotificationsResponse = new MUnreadNotificationsResponse<MissedFeedsDTO>(ResponseCode.ERROR, "", new MissedFeedsDTO());
 

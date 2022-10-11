@@ -11,8 +11,6 @@
         string? Name { get; set; }
         string Origin { get; set; }
         int Quantity { get; set; }
-        string SellerId { get; set; }
-        string SellerIdMail { get; set; }
         string? SKU { get; set; }
         State State { get; set; }
         string? StateDescription { get; set; }
@@ -20,7 +18,9 @@
         string? TSellerId { get; set; }
         string? Size { get; set; }
         string? Batch { get; set; }  
-        public int UserId { get; set; }
-        public int CompanyId { get; set; }
+        int UserId { get; set; }
+        string UserIdMail { get; set; }                      
+        int CompanyId { get; set; }
+        string? Location { get; set; }
     }
 }

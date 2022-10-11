@@ -10,8 +10,10 @@ namespace Otto.users
         {
             // request to entity model
             CreateMap<CreateUserCommand, User>();
+            CreateMap <CreateUserAsAdminCommand, User>();
             CreateMap <UpdateUserCommand, User>();
             CreateMap <UpdateAfterTokenUserCommand, User>();
+
 
 
             //entity model to response

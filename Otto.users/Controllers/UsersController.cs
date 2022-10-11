@@ -61,6 +61,17 @@ namespace Otto.users.Controllers
                 return Conflict(result.Message);
         }
 
+        // POST api/<UsersController>
+        [HttpPost("CreateUserAsAdmin")]
+        public async Task<IActionResult> Post([FromBody] CreateUserAsAdminCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (result.Code.Equals(ResponseCode.OK.ToString()))
+                return CreatedAtAction("GetUser", new { id = result.Content.Id.ToString() }, result);
+            else
+                return Conflict(result.Message);
+        }
+
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] UpdateUserCommand command)
