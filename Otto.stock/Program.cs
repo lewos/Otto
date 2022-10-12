@@ -9,10 +9,16 @@ builder.Services.AddDbContext<OttoDbContext>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors();
+
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors(
+  options => options.WithOrigins("*").AllowAnyMethod().AllowAnyHeader()
+);
 
 app.MapGet("/api/stock", async (OttoDbContext db) =>
 {

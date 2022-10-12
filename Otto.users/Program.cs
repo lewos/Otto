@@ -27,12 +27,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors();
+
 var app = builder.Build();
 
 DBMigrations.PrepOtto(app);
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors(
+  options => options.WithOrigins("*").AllowAnyMethod().AllowAnyHeader()
+);
 
 app.UseAuthorization();
 
