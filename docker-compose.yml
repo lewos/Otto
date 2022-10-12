@@ -82,7 +82,7 @@ services:
       APP_ID: "744560801851200"
       APP_MUSER_ID_OWNER: "302735131"
       CLIENT_SECRET: "Bi64oFtxgykxm6HxTct19JY89hty21zp"
-      REDIRECT_URI: "https://8694-190-195-147-188.sa.ngrok.io/api/MOrders"
+      REDIRECT_URI: "https://139.144.172.25/api/MOrders"
       URL_OTTO_TOKENS: "http://otto.m.tokens"
     ports:
       - "8083:80"
