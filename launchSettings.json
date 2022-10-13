@@ -4,14 +4,15 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "mssql-server": "DoNotStart",
+        "mssql-server": "StartWithoutDebugging",
         "otto.companies": "StartDebugging",
         "otto.m.tokens": "StartDebugging",
         "otto.products": "StartDebugging",
         "otto.stock": "StartDebugging",
         "otto.users": "StartDebugging",
         "otto.requests": "StartDebugging",
-        "otto.orders": "StartDebugging"
+        "otto.orders": "StartDebugging",
+        "otto.stockrequests": "StartDebugging"
       }
     }
   }

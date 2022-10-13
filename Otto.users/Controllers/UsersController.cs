@@ -50,6 +50,14 @@ namespace Otto.users.Controllers
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }
 
+        [HttpGet("GetAllByCompanyId/{id}", Name = "GetAllByCompanyId")]
+        public async Task<IActionResult> GetAllByCompanyId(int id)
+        {
+            var query = new GetAllUsersByCompanyIdQuery(id);
+            var result = await _mediator.Send(query);
+            return result != null ? (IActionResult)Ok(result) : NotFound();
+        }
+
         // POST api/<UsersController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateUserCommand command)

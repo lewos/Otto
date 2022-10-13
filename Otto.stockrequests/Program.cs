@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Otto.models;
+using Otto.models.Migrations;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,8 +26,17 @@ app.UseCors(
 
 app.MapGet("/api/stockrequests", async (OttoDbContext db) =>
 {
-    var requests = await db.StockRequests.ToListAsync();
-    return Results.Ok(getResponses(requests));
+    try
+    {
+        var requests = await db.StockRequests.ToListAsync();
+        return Results.Ok(getResponses(requests));
+
+    }
+    catch (Exception ex )
+    {
+        var a = ex;
+        throw;
+    }
 });
 
 app.MapGet("/api/stockrequests/{id}", async (OttoDbContext db, int id) =>
@@ -118,6 +128,8 @@ app.MapPost("/api/stockrequests", async (OttoDbContext db, StockRequest request)
 
     request.Created = DateTime.Now;
     request.UserIdMail = user.Mail;
+    request.UserName = user.Name;
+    request.UserLastName = user.LastName;
 
     await db.StockRequests.AddAsync(request);
     await db.SaveChangesAsync();
@@ -228,6 +240,12 @@ static void UpdateFields(StockRequest request, StockRequest? stockRequest)
         stockRequest.TSellerId = request.TSellerId;
     if (stockRequest.UserId != request.UserId)
         stockRequest.UserId = request.UserId;
+
+    if (stockRequest.UserName != request.UserName)
+        stockRequest.UserName = request.UserName;
+    if (stockRequest.UserLastName != request.UserLastName)
+        stockRequest.UserLastName = request.UserLastName;
+
     if (stockRequest.UserIdMail != request.UserIdMail)
         stockRequest.UserIdMail = request.UserIdMail;
     if (stockRequest.CompanyId != request.CompanyId)
@@ -238,6 +256,8 @@ static void UpdateFields(StockRequest request, StockRequest? stockRequest)
         stockRequest.Batch = request.Batch;
     if (stockRequest.Location != request.Location)
         stockRequest.Location = request.Location;
+    if (stockRequest.EAN != request.EAN)
+        stockRequest.EAN = request.EAN;
 }
 
 static IEnumerable<StockRequestResponse> getResponses(IEnumerable<StockRequest> joinRequests)
@@ -269,11 +289,17 @@ static StockRequestResponse getResponse(StockRequest stockRequest)
     response.TItemId = stockRequest.TItemId;
     response.TSellerId = stockRequest.TSellerId;
     response.UserId = stockRequest.UserId;
+
+    response.UserName = stockRequest.UserName;
+    response.UserLastName = stockRequest.UserLastName;
+
+
     response.UserIdMail = stockRequest.UserIdMail;
     response.CompanyId = stockRequest.CompanyId;
     response.Size = stockRequest.Size;
     response.Batch = stockRequest.Batch;
     response.Location = stockRequest.Location;
+    response.EAN = stockRequest.EAN;
     return response;
 }
 
@@ -295,10 +321,15 @@ static ProductInStock getProductInStock(StockRequestApplicant request, StockRequ
     productInStock.State = stockRequest.State;
     productInStock.StateDescription = stockRequest.StateDescription;
     productInStock.UserId = stockRequest.UserId;
+
+    productInStock.UserName = stockRequest.UserName;
+    productInStock.UserLastName = stockRequest.UserLastName;
+
     productInStock.UserIdMail = stockRequest.UserIdMail;
     productInStock.CompanyId = stockRequest.CompanyId;
     productInStock.Size = stockRequest.Size;
     productInStock.Batch = stockRequest.Batch;
+    productInStock.EAN = stockRequest.EAN;
 
     productInStock.Location = request.Location;
 
@@ -332,10 +363,13 @@ public class StockRequestResponse
     public string? TItemId { get; set; }
     public string? TSellerId { get; set; }
     public int UserId { get; set; }
-    public string UserIdMail { get; set; }
+    public string? UserName { get; set; }
+    public string? UserLastName { get; set; }
+    public string? UserIdMail { get; set; }
     public int CompanyId { get; set; }
     public string? Size { get; set; }
     public string? Batch { get; set; }
     public string? Location { get; set; }
+    public string? EAN { get; set; }
 }
 

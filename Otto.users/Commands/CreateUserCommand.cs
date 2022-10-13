@@ -11,6 +11,7 @@ namespace Otto.users.Commands
     public class CreateUserCommand : IRequest<Response<CreateUserCommandResponse>>
     {
         public string Name { get; set; }
+        public string LastName { get; set; }
         public string Pass { get; set; }
         public string Mail { get; set; }
         public string Rol { get; set; }
@@ -20,8 +21,10 @@ namespace Otto.users.Commands
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
         public string Mail { get; set; }
         public string Rol { get; set; }
+        public int LoginCount { get; set; }
     }
 
     public class CreateUserHandler : IRequestHandler<CreateUserCommand, Response<CreateUserCommandResponse>>

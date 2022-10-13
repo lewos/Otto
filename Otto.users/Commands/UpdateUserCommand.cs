@@ -10,9 +10,11 @@ namespace Otto.users.Commands
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
         public string? Pass { get; set; }
         public string Mail { get; set; }
         public string Rol { get; set; }
+        public int LoginCount { get; set; }
         public string? TUserId { get; set; }
         public string? MUserId { get; set; }
         public ICollection<Token>? Tokens { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Otto.models;
 
@@ -11,9 +12,10 @@ using Otto.models;
 namespace Otto.models.Migrations
 {
     [DbContext(typeof(OttoDbContext))]
-    partial class OttoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221013190712_UserLastName")]
+    partial class UserLastName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,12 +173,6 @@ namespace Otto.models.Migrations
                     b.Property<int?>("UserIdInProgress")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserLastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Orders");
@@ -203,9 +199,6 @@ namespace Otto.models.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EAN")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
@@ -249,12 +242,7 @@ namespace Otto.models.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserIdMail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserLastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -286,9 +274,6 @@ namespace Otto.models.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EAN")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
@@ -336,12 +321,6 @@ namespace Otto.models.Migrations
 
                     b.Property<string>("UserIdMail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserLastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -414,9 +393,6 @@ namespace Otto.models.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("LoginCount")
-                        .HasColumnType("int");
 
                     b.Property<string>("MUserId")
                         .HasColumnType("nvarchar(max)");

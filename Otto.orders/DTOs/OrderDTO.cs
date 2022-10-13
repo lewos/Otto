@@ -8,6 +8,10 @@
         public int Id { get; set; }
         //vendedor
         public int? UserId { get; set; }
+
+        public string? UserName { get; set; }
+        public string? UserLastName { get; set; }
+
         public long? MUserId { get; set; }
         public long? MOrderId { get; set; }
         public long? MShippingId { get; set; }

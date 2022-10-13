@@ -94,6 +94,10 @@ namespace Otto.orders.Services
             var newOrder = new Order
             {
                 UserId = user.Id,
+
+                UserName = user.Name,
+                UserLastName = user.LastName,
+
                 MUserId = order.Seller.Id,
                 MOrderId = order.Id,
                 MShippingId = order.Shipping.Id,
@@ -196,6 +200,10 @@ namespace Otto.orders.Services
             var newOrder = new Order
             {
                 UserId = user?.Id == null ? 0 : user.Id,
+
+                UserName = user?.Name == null ? null : user.Name,
+                UserLastName = user?.LastName == null ? null : user.LastName,
+
                 MUserId = order?.Seller?.Id == null ? null : order.Seller.Id,
                 MOrderId = order?.Id == null ? null : order.Id,
                 MShippingId = order.Shipping?.Id == null ? null : order.Shipping.Id,

@@ -11,6 +11,7 @@ namespace Otto.users.Commands
     public class CreateUserAsAdminCommand : IRequest<Response<CreateUserCommandResponse>>
     {
         public string Name { get; set; }
+        public string LastName { get; set; }
         public string Pass { get; set; }
         public string Mail { get; set; }
         public string Rol { get; set; }

@@ -497,6 +497,10 @@ namespace Otto.orders.Services
         {
             var utcNow = DateTime.UtcNow;
             order.UserId = newOrder.UserId;
+
+            order.UserName = newOrder.UserName;
+            order.UserLastName = newOrder.UserLastName;
+
             order.MUserId = newOrder.MUserId;
             order.MOrderId = newOrder.MOrderId;
             order.CompanyId = newOrder.CompanyId;
@@ -520,6 +524,16 @@ namespace Otto.orders.Services
             var utcNow = DateTime.UtcNow;
             if (newOrder.UserId != null && order.UserId != null && order.UserId != newOrder.UserId)
                 order.UserId = newOrder.UserId;
+
+            if (order.UserName != null && !string.IsNullOrEmpty(newOrder.UserName) && order.UserName != newOrder.UserName)
+                order.UserName = newOrder.UserName;
+
+            if (order.UserLastName != null && !string.IsNullOrEmpty(newOrder.UserLastName) && order.UserLastName != newOrder.UserLastName)
+                order.UserLastName = newOrder.UserLastName;
+
+            if (order.PackId != null && !string.IsNullOrEmpty(newOrder.PackId) && order.PackId != newOrder.PackId)
+                order.PackId = newOrder.PackId;
+
             if (order.MUserId != null && newOrder.MUserId != null && order.MUserId != newOrder.MUserId)
                 order.MUserId = newOrder.MUserId;
 

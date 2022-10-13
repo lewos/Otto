@@ -4,6 +4,9 @@ services:
 
   otto.stock:
     image: lewos/ottostock:latest
+    build:
+      context: .
+      dockerfile: Otto.stock/Dockerfile
     depends_on:
       - mssql-server
     environment:
@@ -16,6 +19,9 @@ services:
 
   otto.stockrequests:
     image: lewos/ottostockrequests:latest
+    build:
+      context: .
+      dockerfile: Otto.stockrequests/Dockerfile
     depends_on:
       - mssql-server
     environment:
@@ -28,6 +34,9 @@ services:
 
   otto.products:
     image: lewos/ottoproducts:latest
+    build:
+      context: .
+      dockerfile: Otto.products/Dockerfile
     depends_on:
       - mssql-server
       - otto.m.tokens
@@ -42,6 +51,9 @@ services:
 
   otto.m.tokens:
     image: lewos/ottomtokens:latest
+    build:
+      context: .
+      dockerfile: Otto.m.tokens/Dockerfile
     depends_on:
       - mssql-server
     environment:
@@ -56,6 +68,9 @@ services:
 
   otto.orders:
     image: lewos/ottoorders:latest
+    build:
+      context: .
+      dockerfile: Otto.orders/Dockerfile
     depends_on:
       - mssql-server
       - otto.m.tokens
@@ -74,6 +89,9 @@ services:
   
   otto.requests:
     image: lewos/ottorequests:latest
+    build:
+        context: .
+        dockerfile: Otto.requests/Dockerfile
     depends_on:
       - mssql-server
     environment:
@@ -86,6 +104,9 @@ services:
 
   otto.companies:
     image: lewos/ottocompanies:latest
+    build:
+      context: .
+      dockerfile: Otto.companies/Dockerfile
     depends_on:
       - mssql-server
     environment:
@@ -98,6 +119,9 @@ services:
   
   otto.users:
     image: lewos/ottousers:latest
+    build:
+      context: .
+      dockerfile: Otto.users/Dockerfile
     depends_on:
       - mssql-server    
     environment:

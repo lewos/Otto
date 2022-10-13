@@ -10,6 +10,8 @@ namespace Otto.models
         public int Id { get; set; }
         //vendedor
         public int? UserId { get; set; }
+        public string? UserName { get; set; }
+        public string? UserLastName { get; set; }
         public int? ProductInStockId { get; set; }
         public int? CompanyId { get; set; }
         public string ItemId { get; set; } = null!;

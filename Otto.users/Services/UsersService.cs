@@ -56,6 +56,17 @@ namespace Otto.users.Services
                 return user;
             }
         }
+        public async Task<List<User>> GetByCompanyIdAsync(int id)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var users = await db.Users
+                    .Where(u => u.CompanyId == id)
+                    .ToListAsync();
+                return users;
+            }
+        }
+
         public async Task<User> GetUserByMailPassAsync(string mail, string pass)
         {
             using (var db = new OttoDbContext())
@@ -138,12 +149,16 @@ namespace Otto.users.Services
         {
             if (!string.IsNullOrEmpty((user.Name)))
                 inDBUser.Name = inDBUser.Name != user.Name ? user.Name : inDBUser.Name;
+            if (!string.IsNullOrEmpty((user.LastName)))
+                inDBUser.LastName = inDBUser.LastName != user.LastName ? user.LastName : inDBUser.LastName;
             if (!string.IsNullOrEmpty((user.Pass)))
                 inDBUser.Pass = inDBUser.Pass != user.Pass ? user.Pass : inDBUser.Pass;
             if (!string.IsNullOrEmpty((user.Mail)))
                 inDBUser.Mail = inDBUser.Mail != user.Mail ? user.Mail : inDBUser.Mail;
             if (!string.IsNullOrEmpty((user.Rol)))
                 inDBUser.Rol = inDBUser.Rol != user.Rol ? user.Rol : inDBUser.Rol;
+            if (user.LoginCount != 0)
+                inDBUser.LoginCount = inDBUser.LoginCount != user.LoginCount ? user.LoginCount : inDBUser.LoginCount;
             if (!string.IsNullOrEmpty((user.TUserId)))
                 inDBUser.TUserId = inDBUser.TUserId != user.TUserId ? user.TUserId : inDBUser.TUserId;
             if (!string.IsNullOrEmpty((user.MUserId)))

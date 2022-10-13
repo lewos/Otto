@@ -19,10 +19,13 @@
         public string? TItemId { get; set; }
         public string? TSellerId { get; set; }
         public int UserId { get; set; }
+        public string? UserName { get; set; }
+        public string? UserLastName { get; set; }
         public string UserIdMail { get; set; }
         public int CompanyId { get; set; }
         public string? Size { get; set; }
         public string? Batch { get; set; }
         public string? Location { get; set; }
+        public string? EAN { get; set; }
     }
 }

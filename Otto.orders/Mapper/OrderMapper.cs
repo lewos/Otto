@@ -28,6 +28,10 @@ namespace Otto.orders.Mapper
             {
                 Id = dto.Id,
                 UserId = dto.UserId,
+
+                UserName = dto.UserName,
+                UserLastName = dto.UserLastName,
+
                 MUserId = dto.MUserId,
                 MOrderId = dto.MOrderId,
                 CompanyId = dto.CompanyId,
@@ -55,6 +59,10 @@ namespace Otto.orders.Mapper
             {
                 Id = order.Id,
                 UserId = order.UserId,
+
+                UserName = order.UserName,
+                UserLastName = order.UserLastName,
+
                 MUserId = order.MUserId,
                 MOrderId = order.MOrderId,
                 MShippingId = order.MShippingId,

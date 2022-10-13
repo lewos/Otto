@@ -19,8 +19,10 @@ namespace Otto.users.Commands
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
         public string Mail { get; set; }
         public string Rol { get; set; }
+        public int LoginCount { get; set; }
         public string? TUserId { get; set; }
         public string? MUserId { get; set; }
     }
@@ -43,9 +45,12 @@ namespace Otto.users.Commands
             {
                 var passHasher = new PasswordHasher<User>();
                 var verifyResult = passHasher.VerifyHashedPassword(user, user.Pass, request.Pass);
-                var a = verifyResult;
                 if (verifyResult == PasswordVerificationResult.Success)
                 {
+                    //update login count 
+                    user.LoginCount = user.LoginCount + 1;
+                    var rowsAffected = await _userService.UpdateUserAsync(user.Id, user);
+
                     var response = _mapper.Map<LoginUserCommandResponse>(user);
                     return response;
                 }

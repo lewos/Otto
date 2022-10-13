@@ -19,8 +19,11 @@
         string? Size { get; set; }
         string? Batch { get; set; }  
         int UserId { get; set; }
+        string? UserName { get; set; }
+        string? UserLastName { get; set; }
         string UserIdMail { get; set; }                      
         int CompanyId { get; set; }
         string? Location { get; set; }
+        string? EAN { get; set; }
     }
 }
