@@ -4,8 +4,6 @@ services:
 
   otto.stock:
     image: lewos/ottostock:latest
-    depends_on:
-      - mssql-server
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
