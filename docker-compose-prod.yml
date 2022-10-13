@@ -4,6 +4,8 @@ services:
 
   otto.stock:
     image: lewos/ottostock:latest
+    depends_on:
+      - mssql-server
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
@@ -11,3 +13,113 @@ services:
       MSSQL_HOST: "mssql-server-new"
     ports:
       - "8087:80"
+
+  otto.stockrequests:
+    image: lewos/ottostockrequests:latest
+    depends_on:
+      - mssql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8086:80"
+
+  otto.products:
+    image: lewos/ottoproducts:latest
+    depends_on:
+      - mssql-server
+      - otto.m.tokens
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+      URL_OTTO_TOKENS: "http://otto.m.tokens"
+    ports:
+      - "8085:80"
+
+  otto.m.tokens:
+    image: lewos/ottomtokens:latest
+    depends_on:
+      - mssql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+      APP_ID: "744560801851200"
+      CLIENT_SECRET: "Bi64oFtxgykxm6HxTct19JY89hty21zp"
+    ports:
+      - "8084:80"
+
+  otto.orders:
+    image: lewos/ottoorders:latest
+    depends_on:
+      - mssql-server
+      - otto.m.tokens
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+      APP_ID: "744560801851200"
+      APP_MUSER_ID_OWNER: "302735131"
+      CLIENT_SECRET: "Bi64oFtxgykxm6HxTct19JY89hty21zp"
+      REDIRECT_URI: "https://139.144.172.25/api/MOrders"
+      URL_OTTO_TOKENS: "http://otto.m.tokens"
+    ports:
+      - "8083:80"
+  
+  otto.requests:
+    image: lewos/ottorequests:latest
+    depends_on:
+      - mssql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8082:80"
+
+  otto.companies:
+    image: lewos/ottocompanies:latest
+    depends_on:
+      - mssql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8081:80"
+  
+  otto.users:
+    image: lewos/ottousers:latest
+    depends_on:
+      - mssql-server    
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "8080:80"
+  
+  mssql-server:
+    container_name: mssql-server-new
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+        MSSQL_PID: "Express"
+    volumes:
+      - mssql-server-data:/var/opt/mssql/data
+    user: root
+    ports:
+      - "1433:1433"    
+
+volumes:
+  mssql-server-data:
