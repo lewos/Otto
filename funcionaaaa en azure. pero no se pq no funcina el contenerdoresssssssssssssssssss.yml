@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:  
+  ottocompanies:
+    image: ottoregistry.azurecr.io/ottocompanies:latest
+    build:
+      context: .
+      dockerfile: Otto.companies/Dockerfile
+    depends_on:
+      - mssql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "81:81"
+  
+  ottousers:
+    image: ottoregistry.azurecr.io/ottousers:latest
+    build:
+      context: .
+      dockerfile: Otto.users/Dockerfile
+    depends_on:
+      - mssql-server    
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+      MSSQL_PID: "Express"
+      MSSQL_HOST: "mssql-server-new"
+    ports:
+      - "80:80"
+  
+  mssql-server:
+    container_name: mssql-server-new
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
+        MSSQL_PID: "Express"
+    volumes:
+      - mssql-server-data:/var/opt/mssql/data
+    user: root
+    ports:
+      - "1433:1433"    
+
+volumes:
+  mssql-server-data:
+    driver: azure_file
+    driver_opts:
+      share_name: pruebaottofileshare
+      storage_account_name: pruebaottostorageaccount
