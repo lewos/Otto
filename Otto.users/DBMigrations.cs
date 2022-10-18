@@ -25,7 +25,7 @@ namespace Otto.users
             {
                 Console.WriteLine("Adding data - seeding");
 
-                var command = new CreateUserCommand { Mail = "prueba@gmail.com", Name = "Administrador", Pass = "admin", Rol = "Administrador" };
+                var command = new CreateUserCommand { Mail = "prueba@gmail.com", Name = "Administrador", LastName = "ApellidoAdministrador", Pass = "admin", Rol = "Administrador" };
                 mediator.Send(command);
             }
             else 

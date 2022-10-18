@@ -67,6 +67,17 @@ namespace Otto.users.Services
             }
         }
 
+        public async Task<List<User>> GetByCompanyIdAndRolAsync(int id, string rol)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var users = await db.Users
+                    .Where(u => u.CompanyId == id && u.Rol == rol)
+                    .ToListAsync();
+                return users;
+            }
+        }
+
         public async Task<User> GetUserByMailPassAsync(string mail, string pass)
         {
             using (var db = new OttoDbContext())
@@ -90,21 +101,29 @@ namespace Otto.users.Services
         }
         public async Task<User> CreateUserAsync(User user)
         {
-            var userInDb = await GetUserByMail(user.Mail);
-
-            var mailNotInUse = userInDb == null;
-            if (mailNotInUse)
+            try
             {
-                using (var db = new OttoDbContext())
+                var userInDb = await GetUserByMail(user.Mail);
+
+                var mailNotInUse = userInDb == null;
+                if (mailNotInUse)
                 {
-                    db.Users.Add(user);
-                    var rowsAffected = await db.SaveChangesAsync();
-                    return rowsAffected > 0
-                        ? user
-                        : null;
+                    using (var db = new OttoDbContext())
+                    {
+                        db.Users.Add(user);
+                        var rowsAffected = await db.SaveChangesAsync();
+                        return rowsAffected > 0
+                            ? user
+                            : null;
+                    }
                 }
+                return null;
             }
-            return null;
+            catch (Exception ex )
+            {
+                var a= ex;
+                throw;
+            }
         }
         public async Task<bool> UpdateUserAsync(int id, User user)
         {

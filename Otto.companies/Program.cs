@@ -117,6 +117,8 @@ static void UpdateFields(Company request, Company? company)
         company.Name = request.Name;
     if (!string.IsNullOrEmpty(request.CUIT))
         company.CUIT = request.CUIT;
+    if (!string.IsNullOrEmpty(request.PostalCode))
+        company.PostalCode = request.PostalCode;
     if (!string.IsNullOrEmpty(request.Owner))
         company.Owner = request.Owner;
     if (!string.IsNullOrEmpty(request.Street))

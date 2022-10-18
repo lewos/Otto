@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string CUIT  { get; set; }
+        public string PostalCode { get; set; }
         public string Owner { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
