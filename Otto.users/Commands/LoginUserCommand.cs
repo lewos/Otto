@@ -25,6 +25,7 @@ namespace Otto.users.Commands
         public int LoginCount { get; set; }
         public string? TUserId { get; set; }
         public string? MUserId { get; set; }
+        public int? CompanyId { get; set; }
     }
 
     public class LoginUserHandler : IRequestHandler<LoginUserCommand, LoginUserCommandResponse>
