@@ -45,13 +45,17 @@ namespace Otto.orders.Services
             }
         }
 
-        public async Task<Tuple<bool,int>> GetProductInStockByMItemId(string mItemId, int userId)
+        public async Task<Tuple<bool,int>> GetProductInStockByItemId(string itemId, int userId, bool isTiendanube = false)
         {
 
             using (var db = new OttoDbContext())
             {
-                var productInStock = await db.ProductsInStock.Where(p => p.MItemId == mItemId && 
-                                                                         p.UserId == userId).FirstOrDefaultAsync();
+                var productInStock = isTiendanube 
+                    ? await db.ProductsInStock.Where(p => p.TItemId == itemId &&
+                                                          p.UserId == userId).FirstOrDefaultAsync()
+                    
+                    : await db.ProductsInStock.Where(p => p.MItemId == itemId && 
+                                                          p.UserId == userId).FirstOrDefaultAsync();
                 if (productInStock is null)
                     return new Tuple<bool, int>(false, 0);
                 return new Tuple<bool, int>(true,productInStock.Id);

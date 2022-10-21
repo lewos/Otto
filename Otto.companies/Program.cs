@@ -55,26 +55,34 @@ app.MapGet("/api/companies/cuit/{id}", async (OttoDbContext db, string id) =>
 
 app.MapPost("/api/companies", async (OttoDbContext db, Company request) =>
 {
-    //check if userId exist
-    var user = await db.Users.Where(u => u.Id == request.CreatedByUserId && u.Rol == "Administrador").FirstOrDefaultAsync();
-    if(user is null)
-        return Results.Conflict("El usuario no existe o no tiene un rol de Administrador");
+    try
+    {
+        //check if userId exist
+        var user = await db.Users.Where(u => u.Id == request.CreatedByUserId && u.Rol == "Administrador").FirstOrDefaultAsync();
+        if (user is null)
+            return Results.Conflict("El usuario no existe o no tiene un rol de Administrador");
 
-    // check if cuit o name is alredy in db
-    var company = await db.Companies.Where(c => c.Name == request.Name || c.CUIT == request.CUIT).FirstOrDefaultAsync();
-    if (company is not null)
-        return Results.Conflict("Nombre o CUIT ya se encuentran registrados");
+        // check if cuit o name is alredy in db
+        var company = await db.Companies.Where(c => c.Name == request.Name || c.CUIT == request.CUIT).FirstOrDefaultAsync();
+        if (company is not null)
+            return Results.Conflict("Nombre o CUIT ya se encuentran registrados");
 
 
-    await db.Companies.AddAsync(request);
-    await db.SaveChangesAsync();
+        await db.Companies.AddAsync(request);
+        await db.SaveChangesAsync();
 
-    //update user's companyId
-    user.CompanyId = request.Id;
-    //db.Users.Update(user);
-    await db.SaveChangesAsync();
+        //update user's companyId
+        user.CompanyId = request.Id;
+        //db.Users.Update(user);
+        await db.SaveChangesAsync();
 
-    return Results.Created($"/api/companies/{request.Id}", request);
+        return Results.Created($"/api/companies/{request.Id}", request);
+    }
+    catch (Exception ex )
+    {
+        var a = ex;
+        throw;
+    }    
 });
 
 app.MapPut("/api/companies/{id}", async (OttoDbContext db, Company request, int id) =>

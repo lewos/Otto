@@ -12,13 +12,13 @@ namespace Otto.models.Responses
         {
             res = r;
             msg = v;
-            mOrder = o;
+            order = o;
         }
 
         public ResponseCode res { get; set; }
 
         public string msg { get; set; }
 
-        public T mOrder { get; set; }
+        public T order { get; set; }
     }
 }

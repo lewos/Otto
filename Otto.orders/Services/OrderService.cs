@@ -37,7 +37,8 @@ namespace Otto.orders.Services
                 return order;
             }
         }
-        public async Task<List<Order>> GetOrderByPackId(string id)
+
+        public async Task<List<Order>> GetOrdersByPackId(string id)
         {
             using (var db = new OttoDbContext())
             {
@@ -463,14 +464,15 @@ namespace Otto.orders.Services
             }
         }
 
-        public async Task<Tuple<Order, int>> UpdateOrderTableByMIdAsync(long mOrderId, Order newOrder)
+        public async Task<Tuple<Order, int>> UpdateOrderTableBySalesChannelOrderIdAsync(long SalesChannelOrderId, Order newOrder, bool isTiendanube = false, string productId = "")
         {
             try
             {
                 using (var db = new OttoDbContext())
                 {
-                    // Si ya existe un token con ese mismo usuario, hago el update
-                    var order = await db.Orders.Where(t => t.MOrderId == mOrderId).FirstOrDefaultAsync();
+                    Order order = isTiendanube ? await db.Orders.Where(t => t.TOrderId == SalesChannelOrderId && t.ItemId == productId).FirstOrDefaultAsync()
+                                               : await db.Orders.Where(t => t.MOrderId == SalesChannelOrderId).FirstOrDefaultAsync();
+
                     if (order != null)
                     {
 
@@ -539,6 +541,12 @@ namespace Otto.orders.Services
 
             if (order.MOrderId != null && newOrder.MOrderId != null &&  order.MOrderId != newOrder.MOrderId)
                 order.MOrderId = newOrder.MOrderId;
+
+            if (order.TUserId != null && newOrder.TUserId != null && order.TUserId != newOrder.TUserId)
+                order.TUserId = newOrder.TUserId;
+
+            if (order.TOrderId != null && newOrder.TOrderId != null && order.TOrderId != newOrder.TOrderId)
+                order.TOrderId = newOrder.TOrderId;
 
             if (order.CompanyId != null && newOrder.CompanyId != null && order.CompanyId != newOrder.CompanyId)
                 order.CompanyId = newOrder.CompanyId;
@@ -613,6 +621,15 @@ namespace Otto.orders.Services
                 return rowsAffected;
             }
 
+        }
+
+        public async Task<Order> GetOrderByTOrderIdAndItemId(int orderId, string productId)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var order = await db.Orders.Where(t => t.TOrderId == orderId && t.ItemId == productId).FirstOrDefaultAsync();
+                return order;
+            }
         }
     }
 }

@@ -46,6 +46,7 @@ services:
       MSSQL_PID: "Express"
       MSSQL_HOST: "mssql-server-new"
       URL_OTTO_TOKENS: "http://otto.m.tokens"
+      T_USER_AGENT: "(Otto(leo.carmi@gmail.com))"
     ports:
       - "8085:80"
 
@@ -81,9 +82,13 @@ services:
       MSSQL_HOST: "mssql-server-new"
       APP_ID: "744560801851200"
       APP_MUSER_ID_OWNER: "302735131"
+      T_APP_ID: "5294"
+      T_CLIENT_SECRET: "bg5cQxBxlv9fqwtq6b77ewDivPVj85EyAGtWf3M7YysAOBsZ"
       CLIENT_SECRET: "Bi64oFtxgykxm6HxTct19JY89hty21zp"
       REDIRECT_URI: "https://139.144.172.25/api/MOrders"
       URL_OTTO_TOKENS: "http://otto.m.tokens"
+      T_USER_AGENT: "(Otto(leo.carmi@gmail.com))"
+      T_ORDERS_URL_WEBHOOK: "https://139.144.172.25/api/TOrders"
     ports:
       - "8083:80"
   

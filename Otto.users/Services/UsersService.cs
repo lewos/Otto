@@ -151,6 +151,19 @@ namespace Otto.users.Services
             }
         }
 
+        public async Task<bool> UpdateTokenUserIdByTUserIdAsync(int userId, long tUserId)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var token = await db.Tokens.Where(t => t.TUserId == tUserId).FirstOrDefaultAsync();
+                if (token == null)
+                    return false;
+                token.UserId = userId;
+                var rowsAffected = await db.SaveChangesAsync();
+                return rowsAffected > 0;
+            }
+        }
+
 
 
         public async Task<bool> DeleteUserAsync(long id)

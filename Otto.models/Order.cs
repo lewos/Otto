@@ -17,9 +17,15 @@ namespace Otto.models
         public string ItemId { get; set; } = null!;
         public string? PackId { get; set; }
         public int Quantity { get; set; }
+
         public long? MUserId { get; set; }
         public long? MOrderId { get; set; }
         public long? MShippingId { get; set; }
+
+        public long? TUserId { get; set; }
+        public long? TOrderId { get; set; }
+        public long? TShippingId { get; set; }
+
         public string ItemDescription { get; set; } = null!;
         public string? SKU { get; set; }
         public string? EAN { get; set; }

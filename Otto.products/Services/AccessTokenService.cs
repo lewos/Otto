@@ -24,12 +24,12 @@ namespace Otto.products.Services
         }
 
 
-        public async Task<MAccessTokenResponse<Token>> GetTokenCacheAsync(long MUserId)
+        public async Task<AccessTokenResponse<Token>> GetTokenCacheAsync(long channelSellerId, bool isTiendanube = false)
         {
-            var key = $"AccessToken_{MUserId}";
-            if (!_memoryCache.TryGetValue(key, out MAccessTokenResponse<Token> response))
+            var key = $"AccessToken_{channelSellerId}";
+            if (!_memoryCache.TryGetValue(key, out AccessTokenResponse<Token> response))
             {
-                var mAccessTokenResponse = await GetToken(MUserId);
+                var mAccessTokenResponse = await GetToken(channelSellerId, isTiendanube);
                 if (mAccessTokenResponse.res == ResponseCode.OK)
                     _memoryCache.Set(key, mAccessTokenResponse, _cacheEntryOptions);
 
@@ -38,19 +38,24 @@ namespace Otto.products.Services
             return response;
         }
 
-        public async Task<MAccessTokenResponse<Token>> GetToken(long MUserId)
+        public async Task<AccessTokenResponse<Token>> GetToken(long channelSellerId, bool isTiendanube = false)
         {
             using (var db = new OttoDbContext())
             {
-                var mToken = await db.Tokens.Where(t => t.MUserId == MUserId).FirstOrDefaultAsync();
-                if (mToken is null)
-                    return new MAccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario {MUserId}", null);
+                Token token = null;
+                if (!isTiendanube)
+                    token = await db.Tokens.Where(t => t.MUserId == channelSellerId).FirstOrDefaultAsync();
+                else
+                    token = await db.Tokens.Where(t => t.TUserId == channelSellerId).FirstOrDefaultAsync();
 
-                return new MAccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
+                if (token is null)
+                    return new AccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario {channelSellerId}", null);
+
+                return new AccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", token);
             }
         }
 
-        public async Task<MAccessTokenResponse<Token>> GetTokenAfterRefresh(long MUserId)
+        public async Task<AccessTokenResponse<Token>> GetTokenAfterRefresh(long MUserId)
         {
             try
             {
@@ -79,27 +84,27 @@ namespace Otto.products.Services
                     var mToken = await JsonSerializer.DeserializeAsync
                         <Token>(contentStream);
 
-                    return new MAccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
+                    return new AccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", mToken);
                 }
                 //si no lo encontro, verificar en donde leo la respuesta del servicio
-                return new MAccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario {MUserId}", null);
+                return new AccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario {MUserId}", null);
             }
             catch (Exception ex)
             {
                 //verificar en donde leo la respuesta del servicio
-                return new MAccessTokenResponse<Token>(ResponseCode.ERROR, $"Error al obtener el token del usuario {MUserId}. Ex : {ex}", null);
+                return new AccessTokenResponse<Token>(ResponseCode.ERROR, $"Error al obtener el token del usuario {MUserId}. Ex : {ex}", null);
             }
         }
 
-        public async Task<MAccessTokenResponse<Token>> CreateNewRegisterAsync(Token token)
+        public async Task<AccessTokenResponse<Token>> CreateNewRegisterAsync(Token token)
         {
             using (var db = new OttoDbContext())
             {
                 db.Tokens.Add(token);
                 var rowsAffected = await db.SaveChangesAsync();
                 return rowsAffected > 0
-                    ? new MAccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", token)
-                    : new MAccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario", null);
+                    ? new AccessTokenResponse<Token>(ResponseCode.OK, $"{ResponseCode.OK}", token)
+                    : new AccessTokenResponse<Token>(ResponseCode.WARNING, $"No existe el token del usuario", null);
             }
         }
 

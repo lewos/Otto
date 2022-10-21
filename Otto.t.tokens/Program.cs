@@ -1,20 +1,13 @@
-using Otto.products.Services;
+using Otto.models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//builder.Services.AddScoped<MTokenService>();
+builder.Services.AddDbContext<OttoDbContext>();
 
-builder.Services.AddScoped<AccessTokenService>();
-
-builder.Services.AddMemoryCache();
-
-builder.Services.AddScoped<MercadolibreService>();
-builder.Services.AddScoped<ProductsService>();
-builder.Services.AddScoped<StockService>();
-
-builder.Services.AddScoped<TiendanubeService>();
-
-builder.Services.AddHttpClient();
+//builder.Services.AddScoped<RefreshService>();
+//builder.Services.AddHttpClient();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

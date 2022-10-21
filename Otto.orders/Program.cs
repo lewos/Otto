@@ -19,6 +19,10 @@ builder.Services.AddScoped<MOrdersService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<StockService>();
+
+builder.Services.AddScoped<TOrdersService>();
+builder.Services.AddScoped<TiendanubeService>();
+
 builder.Services.AddHttpClient();
 
 

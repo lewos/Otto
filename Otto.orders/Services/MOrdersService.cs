@@ -114,7 +114,7 @@ namespace Otto.orders.Services
             if (state == OrderState.Cancelada)
                 newOrder.StateDescription = $"La orden fue cancelada por el comprador. Id de mediacion {order.Mediations.FirstOrDefault().Id}";
 
-            var algo = await _orderService.UpdateOrderTableByMIdAsync((long)newOrder.MOrderId, newOrder);
+            var algo = await _orderService.UpdateOrderTableBySalesChannelOrderIdAsync((long)newOrder.MOrderId, newOrder);
             Console.WriteLine($"Cantidad de filas afectadas {algo.Item2}");
             return algo.Item2;
         }
@@ -131,7 +131,7 @@ namespace Otto.orders.Services
             }
 
             return orderResponse.res == ResponseCode.OK
-                ? orderResponse.mOrder
+                ? orderResponse.order
                 : null;
 
         }
@@ -145,7 +145,7 @@ namespace Otto.orders.Services
         }
         private async Task<int> GetProductInStockByMItemId(string mItemId, int userId)
         {
-            var tupleStockResponse = await _stockService.GetProductInStockByMItemId(mItemId, userId);
+            var tupleStockResponse = await _stockService.GetProductInStockByItemId(mItemId, userId);
             if (tupleStockResponse.Item1)
                 return tupleStockResponse.Item2;
             return 0;
@@ -292,5 +292,6 @@ namespace Otto.orders.Services
             else
                 return new Tuple<Token, string>(null, "Error");
         }
+
     }
 }

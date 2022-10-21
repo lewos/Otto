@@ -18,7 +18,7 @@ namespace Otto.models
         [JsonPropertyName("AccessToken")]
         public string AccessToken { get; set; } = null!;
         [JsonPropertyName("RefreshToken")]
-        public string RefreshToken { get; set; } = null!;
+        public string? RefreshToken { get; set; } = null!;
         [JsonPropertyName("Type")]
         public string? Type { get; set; }
         [JsonPropertyName("Created")]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Otto.models;
 
@@ -11,9 +12,10 @@ using Otto.models;
 namespace Otto.models.Migrations
 {
     [DbContext(typeof(OttoDbContext))]
-    partial class OttoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221019184019_tokensRefresh")]
+    partial class tokensRefresh
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,15 +170,6 @@ namespace Otto.models.Migrations
 
                     b.Property<string>("StateDescription")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("TOrderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("TShippingId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("TUserId")
-                        .HasColumnType("bigint");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");

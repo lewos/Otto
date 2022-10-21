@@ -22,6 +22,14 @@ namespace Otto.products.Controllers
             return result != null ? (IActionResult)Ok(result) : NotFound();
         }
 
+
+        [HttpGet("GetProductsByTUserId/{id}", Name = "GetProductsByTUserId")]
+        public async Task<IActionResult> GetProductsByTUserId(string id)
+        {
+            var result = await _productsService.GetProductsByTUserId(id);
+            return result != null ? (IActionResult)Ok(result) : NotFound();
+        }
+
         //[HttpGet("GetProductsInStockByMUserId/{id}", Name = "GetProductsInStockByMUserId")]
         //public async Task<IActionResult> GetProductsInStockByMUserId(string id)
         //{

@@ -2,9 +2,9 @@
 
 namespace Otto.models.Responses
 {
-    public class MAccessTokenResponse<T>
+    public class AccessTokenResponse<T>
     {
-        public MAccessTokenResponse(ResponseCode r, string v, T mtoken)
+        public AccessTokenResponse(ResponseCode r, string v, T mtoken)
         {
             res = r;
             msg = v;

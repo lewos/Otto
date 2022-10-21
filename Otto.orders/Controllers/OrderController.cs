@@ -16,15 +16,17 @@ namespace Otto.orders.Controllers
         private readonly AccessTokenService _accessTokenService;
         private readonly MercadolibreService _mercadolibreService;
         private readonly MOrdersService _mOrdersService;
+        private readonly TOrdersService _tOrdersService;
 
         public OrderController(OrderService orderService,StockService stockService, AccessTokenService accessTokenService,
-            MercadolibreService mercadolibreService, MOrdersService mOrdersService)
+            MercadolibreService mercadolibreService, MOrdersService mOrdersService, TOrdersService tOrdersService)
         {
             _orderService = orderService;
             _stockService = stockService;
             _accessTokenService = accessTokenService;
             _mercadolibreService = mercadolibreService;
             _mOrdersService = mOrdersService;
+            _tOrdersService = tOrdersService;
         }
 
         [HttpGet]
@@ -97,6 +99,7 @@ namespace Otto.orders.Controllers
                 var tupleResultProduct = await _stockService.GetProductInStockById((int)itemsInPack.Items.FirstOrDefault().ProductInStockId);
 
                 bool pudoActualizarStock = false;
+                bool pudoCumplirLaOrden = false;
 
                 if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Mercadolibre")
                 {
@@ -113,9 +116,17 @@ namespace Otto.orders.Controllers
                         // restar stock de la venta finalizada ej "MLA1149237532"
                         pudoActualizarStock = await _stockService.UpdateQuantityByTItemId(orderDTO.Quantity, orderDTO.ItemId, (int)orderDTO.UserId, (int)orderDTO.CompanyId);
                     }
+                    //TODO Cambiar el estado de la orden
+                    var pudoCumplirLaOrdenResponse = await _tOrdersService.FulfillOrder((int)itemsInPack.Items[0].UserId, (int)itemsInPack.Items[0].TUserId, itemsInPack.PackId);
+                    pudoCumplirLaOrden = pudoCumplirLaOrdenResponse.res == ResponseCode.OK; 
+
                 }
-                if (pudoActualizarStock)
+                if (pudoActualizarStock && tupleResultProduct.Item2.Origin == "Mercadolibre")
                     return Ok("Ok");
+                else if (pudoActualizarStock && tupleResultProduct.Item2.Origin == "Tiendanube" && pudoCumplirLaOrden)
+                    return Ok("Ok");
+                else if (pudoActualizarStock && tupleResultProduct.Item2.Origin == "Tiendanube" && !pudoCumplirLaOrden)
+                    return Conflict("No se pudo actualizar el estado de al orden en el canal de venta. Verificar");
                 else
                     return Conflict("No se pudo actualizar la cantidad de del producto en el inventario. Verificar");
             }

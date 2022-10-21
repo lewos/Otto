@@ -24,12 +24,13 @@ namespace Otto.orders.Services
         }
 
 
-        public async Task<UserResponse<User>> GetUserByMIdCacheAsync(string MUserId)
+        public async Task<UserResponse<User>> GetUserByMIdCacheAsync(string channelSellerId, bool isTiendanube = false)
         {
-            var key = $"UserByMId_{MUserId}";
+            string key = isTiendanube ? $"UserByTId_{channelSellerId}" : $"UserByMId_{channelSellerId}";
+
             if (!_memoryCache.TryGetValue(key, out UserResponse<User> response))
             {
-                var userResponse = await GetUserByMIdAsync(MUserId);
+                var userResponse = await GetUserByChannelSellerIdIdAsync(channelSellerId, isTiendanube);
                 _memoryCache.Set(key, userResponse, _cacheEntryOptions);
 
                 return userResponse;
@@ -37,17 +38,20 @@ namespace Otto.orders.Services
             return response;
         }
 
-        public async Task<UserResponse<User>> GetUserByMIdAsync(string MUserId) 
+        public async Task<UserResponse<User>> GetUserByChannelSellerIdIdAsync(string channelSellerId, bool isTiendanube = false) 
         {
             using (var db = new OttoDbContext())
             {
-                var user = await db.Users.Where(t => t.MUserId == MUserId).FirstOrDefaultAsync();
+                var user = isTiendanube 
+                    ? await db.Users.Where(t => t.TUserId == channelSellerId).FirstOrDefaultAsync() 
+                    : await db.Users.Where(t => t.MUserId == channelSellerId).FirstOrDefaultAsync();
+                
                 if (user is null)
-                    return new UserResponse<User>(ResponseCode.WARNING, $"No existe el usuario con el id {MUserId}", null);
+                    return new UserResponse<User>(ResponseCode.WARNING, $"No existe el usuario con el id {channelSellerId}", null);
 
                 return new UserResponse<User>(ResponseCode.OK, $"{ResponseCode.OK}", user);
-
             }
         }
+
     }
 }

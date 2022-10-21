@@ -2,19 +2,19 @@
 
 namespace Otto.models.Responses
 {
-    public class MItemsSearchResponse<T>
+    public class ItemsSearchResponse<T>
     {
-        public MItemsSearchResponse(ResponseCode r, string v, T _mItemsSearch)
+        public ItemsSearchResponse(ResponseCode r, string v, T _itemsSearch)
         {
             res = r;
             msg = v;
-            mItemsSearch = _mItemsSearch;
+            itemsSearch = _itemsSearch;
         }
 
         public ResponseCode res { get; set; }
 
         public string msg { get; set; }
 
-        public T mItemsSearch { get; set; }
+        public T itemsSearch { get; set; }
     }
 }
