@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Otto.common.services\Otto.common.services.csproj" />
     <ProjectReference Include="..\Otto.models\Otto.models.csproj" />
   </ItemGroup>
 

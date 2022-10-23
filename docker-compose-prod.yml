@@ -104,12 +104,14 @@ services:
   otto.users:
     image: lewos/ottousers:latest
     depends_on:
-      - mssql-server    
+      - mssql-server
+      - otto.requests
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "Pa$$w0rd2019"
       MSSQL_PID: "Express"
       MSSQL_HOST: "mssql-server-new"
+      URL_OTTO_REQUESTS: "http://otto.requests"
     ports:
       - "8080:80"
   

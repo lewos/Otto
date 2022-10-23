@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.orders", "Otto.orders\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.stockrequests", "Otto.stockrequests\Otto.stockrequests.csproj", "{EB809146-D227-4068-9E24-B5843CE6625E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otto.t.tokens", "Otto.t.tokens\Otto.t.tokens.csproj", "{3DD5D1CA-9668-4EE9-8A10-76C754E68220}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otto.t.tokens", "Otto.t.tokens\Otto.t.tokens.csproj", "{3DD5D1CA-9668-4EE9-8A10-76C754E68220}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otto.common.services", "Otto.common.services\Otto.common.services.csproj", "{65D5289A-2C5C-4422-A3EC-BD8547F32753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{3DD5D1CA-9668-4EE9-8A10-76C754E68220}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DD5D1CA-9668-4EE9-8A10-76C754E68220}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DD5D1CA-9668-4EE9-8A10-76C754E68220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D5289A-2C5C-4422-A3EC-BD8547F32753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D5289A-2C5C-4422-A3EC-BD8547F32753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D5289A-2C5C-4422-A3EC-BD8547F32753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D5289A-2C5C-4422-A3EC-BD8547F32753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

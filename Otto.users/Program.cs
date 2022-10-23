@@ -1,5 +1,6 @@
 using AutoMapper;
 using MediatR;
+using Otto.common.services;
 using Otto.models;
 using Otto.users;
 using Otto.users.Services;
@@ -12,6 +13,10 @@ builder.Services.AddMediatR(typeof(Program).GetTypeInfo().Assembly);
 builder.Services.AddDbContext<OttoDbContext>();
 
 builder.Services.AddSingleton<UsersService>();
+
+builder.Services.AddScoped<HttpRequestsService>();
+builder.Services.AddHttpClient();
+
 
 var mapperConfig = new MapperConfiguration(m =>
 {

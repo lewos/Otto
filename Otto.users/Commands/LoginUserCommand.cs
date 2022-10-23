@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Otto.common.services;
 using Otto.models;
 using Otto.users.Services;
 using System.Text.Json.Serialization;
@@ -26,6 +27,7 @@ namespace Otto.users.Commands
         public string? TUserId { get; set; }
         public string? MUserId { get; set; }
         public int? CompanyId { get; set; }
+        public bool HasPendingRequests { get; set; } = false;
     }
 
     public class LoginUserHandler : IRequestHandler<LoginUserCommand, LoginUserCommandResponse>
@@ -33,10 +35,12 @@ namespace Otto.users.Commands
 
         private readonly UsersService _userService;
         private readonly IMapper _mapper;
-        public LoginUserHandler(UsersService userService, IMapper mapper)
+        private readonly HttpRequestsService _httpRequestsService;
+        public LoginUserHandler(UsersService userService, IMapper mapper, HttpRequestsService httpRequestsService)
         {
             _userService = userService;
             _mapper = mapper;
+            _httpRequestsService = httpRequestsService;
         }
 
         public async Task<LoginUserCommandResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -53,6 +57,15 @@ namespace Otto.users.Commands
                     var rowsAffected = await _userService.UpdateUserAsync(user.Id, user);
 
                     var response = _mapper.Map<LoginUserCommandResponse>(user);
+
+                    var urlRequestsService =Environment.GetEnvironmentVariable("URL_OTTO_REQUESTS");
+
+                    //request pendientes
+                    var requestResponse = await _httpRequestsService.GetRequest(user.Id, "pendiente", urlRequestsService);
+
+                    if(requestResponse.res == ResponseCode.OK && requestResponse.content.Count > 0)
+                        response.HasPendingRequests = true;
+
                     return response;
                 }
             }
