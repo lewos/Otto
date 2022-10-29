@@ -83,8 +83,6 @@ services:
     ports:
       - "8083:80"
       - "9083:443"
-    ports:
-      - "8083:80"
   
   otto.requests:
     image: lewos/ottorequests:latest
