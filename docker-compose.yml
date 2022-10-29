@@ -90,8 +90,15 @@ services:
       T_USER_AGENT: "(Otto(leo.carmi@gmail.com))"
       PROD_T_ORDERS_URL_WEBHOOK: "https://139.144.172.25:8083/api/TOrders"
       T_ORDERS_URL_WEBHOOK: "https://31a1-190-195-147-188.sa.ngrok.io/api/TOrders"
+      ASPNETCORE_URLS: "https://+;http://+"
+      ASPNETCORE_HTTPS_PORT: "9083"
+      ASPNETCORE_ENVIRONMENT: Development
+    volumes:
+      - prueba-data:/var/opt/.microsoft/usersecrets
+      - prueba-data:/var/opt/.aspnet/https/
     ports:
       - "8083:80"
+      - "9083:443"
   
   otto.requests:
     image: lewos/ottorequests:latest
@@ -155,3 +162,4 @@ services:
 
 volumes:
   mssql-server-data:
+  prueba-data:
