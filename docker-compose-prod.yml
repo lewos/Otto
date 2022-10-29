@@ -77,9 +77,10 @@ services:
       ASPNETCORE_URLS: "https://+;http://+"
       ASPNETCORE_HTTPS_PORT: "9083"
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_Kestrel__Certificates__Default__Password: pa55w0rd!
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /Otto.orders.pfx
     volumes:
-      - prueba-data:/var/opt/.microsoft/usersecrets
-      - prueba-data:/var/opt/.aspnet/https/
+      - prueba-data:/root/Otto/
     ports:
       - "8083:80"
       - "9083:443"
