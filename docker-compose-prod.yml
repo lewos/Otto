@@ -55,7 +55,7 @@ services:
     ports:
       - "8084:80"
 
-   otto.orders:
+  otto.orders:
     image: lewos/ottoorders:latest
     depends_on:
       - mssql-server
