@@ -15,6 +15,7 @@ builder.Services.AddDbContext<OttoDbContext>();
 builder.Services.AddSingleton<UsersService>();
 
 builder.Services.AddScoped<HttpRequestsService>();
+builder.Services.AddScoped<HttpTokenService>();
 builder.Services.AddHttpClient();
 
 

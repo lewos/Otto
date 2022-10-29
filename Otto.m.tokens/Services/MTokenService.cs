@@ -41,6 +41,18 @@ namespace Otto.m.tokens.Services
             return null;
         }
 
+        public async Task<List<Token>> GetTokesnByUserIdAsync(long id)
+        {
+
+            var tokens = await _context.Tokens.Where(t => t.UserId == id).ToListAsync();
+            if (tokens != null)
+            {
+                return tokens;
+            }
+
+            return null;
+        }
+
 
         public async Task<Token> RefreshMTokenByUserAsync(long id)
         {

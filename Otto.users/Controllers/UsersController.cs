@@ -124,5 +124,13 @@ namespace Otto.users.Controllers
                 ? (IActionResult)Created("", result)
                 : Unauthorized("Combinacion de usuario y contraseña no valido");
         }
+
+        [HttpPut("unlink/{channel}/user/{id}")]
+        public async Task<IActionResult> UnlinkSalesChannel(string channel, int id)
+        {
+            var command = new UnlinkSalesChannelCommand { Id = id, Channel = channel };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }

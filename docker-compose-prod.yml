@@ -120,6 +120,7 @@ services:
       MSSQL_PID: "Express"
       MSSQL_HOST: "mssql-server-new"
       URL_OTTO_REQUESTS: "http://otto.requests"
+      URL_OTTO_TOKENS: "http://otto.m.tokens"
     ports:
       - "8080:80"
   

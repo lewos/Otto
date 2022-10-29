@@ -65,6 +65,21 @@ namespace Otto.m.tokens.Controllers
             return mToken;
         }
 
+        // GET: api/MTokens/ByMUserId/5
+        [HttpGet("ByUserId/{id}")]
+        public async Task<ActionResult<List<Token>>> GetTokensByUserId(long id)
+        {
+            var tokens = await _service.GetTokesnByUserIdAsync(id);
+
+            if (tokens == null)
+            {
+                return NotFound();
+            }
+
+            return tokens;
+        }
+
+
 
         // POST: api/MTokens/RefreshByMUserId/5
         [HttpGet("RefreshByMUserId/{id}")]
@@ -174,6 +189,30 @@ namespace Otto.m.tokens.Controllers
         {
             return (_context.Tokens?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        [HttpDelete("user/{id}/channel/{channel}/channelUserId/{channelUserId}")]
+        public async Task<IActionResult> DeleteToken(int id, string channel, long channelUserId)
+        {
+            if (_context.Tokens == null)
+            {
+                return NotFound();
+            }
+            List<Token> tokens = null;
+            if(channel.Equals("Mercadolibre"))
+                tokens = await _context.Tokens.Where(t=> t.UserId == id && t.MUserId == channelUserId).ToListAsync();
+            else
+                tokens = await _context.Tokens.Where(t => t.UserId == id && t.TUserId == channelUserId).ToListAsync();
+
+            if (tokens?.Count == 0)
+                return Ok();
+
+            _context.Tokens.RemoveRange(tokens);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
     }
 
 }
