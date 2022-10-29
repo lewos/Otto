@@ -283,7 +283,8 @@ namespace Otto.orders.Services
         {
             MCodeForTokenDTO mCodeForTokenDTO = await _mercadolibreService.GetTokenWithCodeAsync(code);
 
-            //var mToken = AccessTokenMapper.GetMTokenDTO(mCodeForTokenDTO);
+            Console.WriteLine($"mCodeForTokenDTO: {mCodeForTokenDTO}");
+
             var token = AccessTokenMapper.GetToken(mCodeForTokenDTO);
 
             var mAccessTokenResponse = await _accessTokenService.CreateNewRegisterAsync(token, "Mercadolibre");
