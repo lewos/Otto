@@ -76,9 +76,9 @@ namespace Otto.orders.Controllers
                 var res = tuple.Item2;
 
                 if (res.Contains("Ok"))
-                    return Redirect($"https://google.com/{token.MUserId}");
+                    return Redirect($"http://localhost:3000/cliente_fulfillment/permisos/permisos_otorgados/{token.MUserId}");
             }
-            return Redirect("https://yahoo.com");
+            return Redirect("http://localhost:3000/cliente_fulfillment/permisos/error_permisos");
         }
     }
 }
