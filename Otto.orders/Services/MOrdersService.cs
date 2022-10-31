@@ -26,6 +26,8 @@ namespace Otto.orders.Services
             //Ver si el topico es el que necesito
             if (!string.IsNullOrEmpty(dto.Topic) && dto.Topic.Contains("orders_v2"))
             {
+                Console.WriteLine("llego una orden");
+
                 // TODO Guardar en un cache en memoria, algunas ordenes asi no consulto la base constantemente
                 if (await isNewOrder(dto))
                 {
@@ -46,6 +48,7 @@ namespace Otto.orders.Services
             {
                 //Ver como llega la orden. LLega un item/producto por orden, por lo tanto tengo que guardar la orden y se va a agrupar por el pack id
                 //Si no tiene pack_id, la orden contiene un solo producto
+                Console.WriteLine("ir a crear la orden");
                 var a = await CreateOrder(mOrder);
                 return a;
             }
@@ -120,6 +123,7 @@ namespace Otto.orders.Services
         }
         private async Task<MOrderDTO> GetMOrder(MOrderNotificationDTO dto)
         {
+            Console.WriteLine("buscando el accesstoken");
             //Buscar el accessToken de ese usuario
             Token accessToken = await GetAccessToken(dto);
 
@@ -128,6 +132,7 @@ namespace Otto.orders.Services
             if (accessToken != null)
             {
                 orderResponse = await _mercadolibreService.GetMOrderAsync((long)dto.MUserId, dto.Resource, accessToken.AccessToken);
+                Console.WriteLine($"respuesta de la orden de mercadolibre: {orderResponse}");
             }
 
             return orderResponse.res == ResponseCode.OK
@@ -185,9 +190,11 @@ namespace Otto.orders.Services
         {
             // Buscar ese usuario id
             var user = await GetUser(order.Seller.Id.ToString());
+            Console.WriteLine($"user de la orden: {user}");
 
             //Buscar ese producto en el stock
             int productInStockId = await GetProductInStockByMItemId(order?.OrderItems[0].Item.Id, user.Id);
+            Console.WriteLine($"productInStockId: {productInStockId}");
 
             //El producto no esta en stock
             if (productInStockId == 0) 
@@ -237,9 +244,12 @@ namespace Otto.orders.Services
         private async Task<Token> GetAccessToken(MOrderNotificationDTO dto)
         {
             var res = await _accessTokenService.GetTokenCacheAsync((long)dto.MUserId);
+            Console.WriteLine($"respuesta access token: {res}");
 
-            if (hasTokenExpired(res.token))
+            if (hasTokenExpired(res.token)) {
                 res = await _accessTokenService.GetTokenAfterRefresh((long)dto.MUserId);
+                Console.WriteLine($"respuesta del refresh: {res}");
+            }                
             return res.token;
         }
         private async Task<Token> GetAccessTokenByMuserId(long mUserId)
@@ -254,8 +264,11 @@ namespace Otto.orders.Services
         {
             var utcNow = DateTime.UtcNow;
             // Si expiro o si esta a punto de expirar
-            if (token.ExpiresAt < utcNow + TimeSpan.FromMinutes(10))
+            if (token.ExpiresAt < utcNow + TimeSpan.FromMinutes(10)) 
+            {
+                Console.WriteLine("accesstoken expiro");
                 return true;
+            }
             return false;
         }
         public async Task<MissedFeedsDTO> GetMUnreadNotificationsAsync()

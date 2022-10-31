@@ -44,6 +44,8 @@ namespace Otto.orders.Controllers
         public async Task<IActionResult> Post(MOrderNotificationDTO dto)
         {
             string jsonString = JsonSerializer.Serialize(dto);
+            
+            Console.WriteLine(jsonString);
 
             //Procesar dentro de una cola -- para responder dentro de los 500ms 
            _queueTasks.Enqueue(_mOrdersService.ProcesarOrden(dto));

@@ -120,11 +120,21 @@ app.MapPost("/api/stock", async (OttoDbContext db, ProductInStock request) =>
 
 app.MapPut("/api/stock/{id}", async (OttoDbContext db, ProductInStock request, int id) =>
 {
-    var product = await db.ProductsInStock.FindAsync(id);
-    if (product is null) return Results.NotFound();
-    UpdateFields(request, product);
-    await db.SaveChangesAsync();
-    return Results.NoContent();
+    try
+    {
+        var product = await db.ProductsInStock.FindAsync(id);
+        if (product is null) return Results.NotFound();
+        UpdateFields(request, product);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+
+    }
+    catch (Exception ex )
+    {
+        var a = ex;
+        throw;
+    }
+    
 });
 
 app.MapPut("/api/stock/UpdateQuantityById/{id}", async (OttoDbContext db, UpdateQuantityDTO dto, int id) =>
@@ -154,21 +164,29 @@ app.Run();
 
 static void UpdateFields(ProductInStock request, ProductInStock? stock)
 {
-    stock.Name = request.Name;
-    stock.Description = request.Description;
+    stock.Id = request.Id;
+    stock.Name = !string.IsNullOrEmpty(request.Name) ? request.Name : stock.Name;
+    stock.Description = !string.IsNullOrEmpty(request.Description) ? request.Description : stock.Description;
+    stock.Origin = !string.IsNullOrEmpty(request.Origin) ? request.Origin : stock.Origin;
     stock.Quantity = request.Quantity;
-    stock.Origin = request.Origin;
-    stock.UserId = request.UserId;
-    stock.UserIdMail = request.UserIdMail;
-    stock.MSellerId = request.MSellerId;
-    stock.TSellerId = request.TSellerId;
-    stock.MItemId = request.MItemId;
-    stock.TItemId = request.TItemId;
-    stock.SKU = request.SKU;
-    stock.Code = request.Code;
-    stock.Category = request.Category;
+    stock.MSellerId = !string.IsNullOrEmpty(request.MSellerId) ? request.MSellerId : stock.MSellerId;
+    stock.TSellerId = !string.IsNullOrEmpty(request.TSellerId) ? request.TSellerId : stock.TSellerId;
+    stock.MItemId = !string.IsNullOrEmpty(request.MItemId) ? request.MItemId : stock.MItemId;
+    stock.TItemId = !string.IsNullOrEmpty(request.TItemId) ? request.TItemId : stock.TItemId;
+    stock.SKU = !string.IsNullOrEmpty(request.SKU) ? request.SKU : stock.SKU;
+    stock.Code = !string.IsNullOrEmpty(request.Code) ? request.Code : stock.Code;
+    stock.Category = !string.IsNullOrEmpty(request.Category) ? request.Category : stock.Category;
     stock.State = request.State;
-    stock.StateDescription = request.StateDescription;
+    stock.StateDescription = !string.IsNullOrEmpty(request.StateDescription) ? request.StateDescription : stock.StateDescription;
+    stock.UserId = request.UserId;
+    stock.UserName = !string.IsNullOrEmpty(request.UserName) ? request.UserName : stock.UserName;
+    stock.UserLastName = !string.IsNullOrEmpty(request.UserLastName) ? request.UserLastName : stock.UserLastName;
+    stock.UserIdMail = !string.IsNullOrEmpty(request.UserIdMail) ? request.UserIdMail : stock.UserIdMail;
+    stock.CompanyId = request.CompanyId;
+    stock.Size = !string.IsNullOrEmpty(request.Size) ? request.Size : stock.Size;
+    stock.Batch = !string.IsNullOrEmpty(request.Batch) ? request.Batch : stock.Batch;
+    stock.Location = !string.IsNullOrEmpty(request.Location) ? request.Location : stock.Location;
+    stock.EAN = !string.IsNullOrEmpty(request.EAN) ? request.EAN : stock.EAN;
 }
 
 

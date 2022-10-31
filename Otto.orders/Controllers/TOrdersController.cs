@@ -57,9 +57,9 @@ namespace Otto.orders.Controllers
 
 
                 if (res.Contains("Ok") && resCreateOrderWebHook)
-                    return Redirect($"https://google.com/{token.TUserId}");
+                    return Redirect($"http://localhost:3000/cliente_fulfillment/permisos/permisos_otorgados_tiendanube/#{token.TUserId}");
             }
-            return Redirect("https://yahoo.com");
+            return Redirect("http://localhost:3000/cliente_fulfillment/permisos/error_permisos");
         }
     }
 }
