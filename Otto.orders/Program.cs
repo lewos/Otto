@@ -35,7 +35,7 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseSwagger();
 app.UseSwaggerUI();

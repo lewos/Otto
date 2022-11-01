@@ -133,57 +133,12 @@ namespace Otto.orders.Controllers
             return Conflict(result.Item3);
         }
 
-        //[HttpPost("company/{id}/pack/{pack}/print")]
-        //public async Task<IActionResult> PrintOrderReceiptByPackId([FromBody] InProgressDTO dto, int id, string pack)
-        //{
-        //    var packDto = await _orderService.GetOrderInProgressByPackIdAsync(pack, dto.UserIdInProgress);
-        //    if (packDto?.Items?.Count <= 0)
-        //        return Conflict("No se encontro una orden con ese id");
-            
-        //    var orderDto = packDto.Items.FirstOrDefault();
-            
-        //    var tupleResultProduct = await _stockService.GetProductInStockById((int)orderDto.ProductInStockId);
-        //    if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Mercadolibre")
-        //    {
-        //        //Token accessToken = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
-        //        var accessTokenResponse = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
-
-        //        if (hasTokenExpired(accessTokenResponse.token))
-        //            accessTokenResponse = await _accessTokenService.GetTokenAfterRefresh((long)accessTokenResponse.token.MUserId);
-
-        //        var orderResponse = new MOrderResponse<MOrderDTO>(ResponseCode.ERROR, "", new MOrderDTO());
-
-        //        if (accessTokenResponse.token != null)
-        //        {
-        //            //obtener el link del pdf para imprimir
-        //            var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessTokenResponse.token.AccessToken);
-
-        //            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-        //            response.Content = pdf;
-        //            response.StatusCode = HttpStatusCode.OK;
-        //            return Ok(response);
-
-
-        //            return Ok(pdf);
-
-        //        }
-        //        return Conflict("Error al obtener el token");
-
-        //    }
-        //    else if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Tiendanube")
-        //    {
-        //        //TODO
-        //        return Ok("ver imprimir tienda nube");
-        //    }
-        //    else
-        //        return Conflict("No se encontro el producto dentro del inventario");
-        //}
-
-
         [HttpGet("company/{id}/pack/{pack}/print/{userInProgress}")]
-        public async Task<HttpResponseMessage> PrintOrderReceiptByPackIdPrueba(int id, string pack, int userInProgress)
+        public async Task<IActionResult> PrintOrderReceiptByPackId(int id, string pack, int userInProgress)
         {
             var packDto = await _orderService.GetOrderInProgressByPackIdAsync(pack, userInProgress);
+            if (packDto?.Items?.Count <= 0)
+                return Conflict("No se encontro una orden con ese id");
 
             var orderDto = packDto.Items.FirstOrDefault();
 
@@ -203,13 +158,52 @@ namespace Otto.orders.Controllers
                     //obtener el link del pdf para imprimir
                     var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessTokenResponse.token.AccessToken);
 
+                    return Ok(pdf);
 
-                    return pdf;                    
                 }
+                return Conflict("Error al obtener el token");
+
             }
-            HttpResponseMessage response2 = new HttpResponseMessage(HttpStatusCode.BadRequest);
-            return response2;
+            else if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Tiendanube")
+            {
+                //TODO
+                return Ok("ver imprimir tienda nube");
+            }
+            else
+                return Conflict("No se encontro el producto dentro del inventario");
         }
+
+
+        //[HttpGet("company/{id}/pack/{pack}/print/{userInProgress}")]
+        //public async Task<HttpResponseMessage> PrintOrderReceiptByPackIdPrueba(int id, string pack, int userInProgress)
+        //{
+        //    var packDto = await _orderService.GetOrderInProgressByPackIdAsync(pack, userInProgress);
+
+        //    var orderDto = packDto.Items.FirstOrDefault();
+
+        //    var tupleResultProduct = await _stockService.GetProductInStockById((int)orderDto.ProductInStockId);
+        //    if (tupleResultProduct.Item1 && tupleResultProduct.Item2.Origin == "Mercadolibre")
+        //    {
+        //        Token accessToken = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
+        //        var accessTokenResponse = await _accessTokenService.GetAccessTokenByUserIdCacheAsync((int)orderDto.UserId);
+
+        //        if (hasTokenExpired(accessTokenResponse.token))
+        //            accessTokenResponse = await _accessTokenService.GetTokenAfterRefresh((long)accessTokenResponse.token.MUserId);
+
+        //        var orderResponse = new MOrderResponse<MOrderDTO>(ResponseCode.ERROR, "", new MOrderDTO());
+
+        //        if (accessTokenResponse.token != null)
+        //        {
+        //            obtener el link del pdf para imprimir
+        //            var pdf = await _mercadolibreService.GetPrintOrderAsync((long)orderDto.MShippingId, accessTokenResponse.token.AccessToken);
+
+
+        //            return pdf;                    
+        //        }
+        //    }
+        //    HttpResponseMessage response2 = new HttpResponseMessage(HttpStatusCode.BadRequest);
+        //    return response2;
+        //}
 
 
 

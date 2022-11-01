@@ -39,6 +39,11 @@ namespace Otto.orders.Services
 
         public async Task<AccessTokenResponse<Token>> GetToken(long channelSellerId, bool isTiendanube = false)
         {
+            Console.WriteLine($"channelSellerId {channelSellerId}");
+            Console.WriteLine($"isTiendanube {isTiendanube}");
+            Console.WriteLine($"!isTiendanube {!isTiendanube}");
+
+
             using (var db = new OttoDbContext())
             {
                 Token token = null;

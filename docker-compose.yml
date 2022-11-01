@@ -85,7 +85,7 @@ services:
       T_APP_ID: "5294"
       T_CLIENT_SECRET: "bg5cQxBxlv9fqwtq6b77ewDivPVj85EyAGtWf3M7YysAOBsZ"
       CLIENT_SECRET: "Bi64oFtxgykxm6HxTct19JY89hty21zp"
-      REDIRECT_URI: "https://139.144.172.25:8083/api/MOrders"
+      REDIRECT_URI: "https://35b1-200-127-209-10.sa.ngrok.io/api/MOrders"
       URL_OTTO_TOKENS: "http://otto.m.tokens"
       T_USER_AGENT: "(Otto(leo.carmi@gmail.com))"
       PROD_T_ORDERS_URL_WEBHOOK: "https://139.144.172.25:8083/api/TOrders"

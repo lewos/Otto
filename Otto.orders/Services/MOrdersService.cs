@@ -255,6 +255,7 @@ namespace Otto.orders.Services
         private async Task<Token> GetAccessTokenByMuserId(long mUserId)
         {
             var res = await _accessTokenService.GetTokenCacheAsync(mUserId);
+            Console.WriteLine($"res {res}");
 
             if (hasTokenExpired(res.token))
                 res = await _accessTokenService.GetTokenAfterRefresh(mUserId);
@@ -276,6 +277,10 @@ namespace Otto.orders.Services
             //este el es id del usario dueño de la aplicacion en mercadolibre
             long mUserId = long.Parse(Environment.GetEnvironmentVariable("APP_MUSER_ID_OWNER"));
             string appId = Environment.GetEnvironmentVariable("APP_ID");
+            
+            Console.WriteLine($"mUserId {mUserId}");
+            Console.WriteLine($"appId {appId}");
+
 
             //Buscar el accessToken de ese usuario
             Token accessToken = await GetAccessTokenByMuserId(mUserId);

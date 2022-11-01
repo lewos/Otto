@@ -152,47 +152,7 @@ namespace Otto.orders.Services
             }
 
         }
-        public async Task<HttpResponseMessage> GetPrintOrderAsync(long Resource, string AccessToken, bool pdf = true)
-        {
-            try
-            {
-                //Deberia estar en una variable de entorno
-                string baseUrl = "https://api.mercadolibre.com";
-                //Por ahora solo busco pdf
-                string responseType = pdf ? "pdf" : "zpl2";
-                string endpoint = $"shipment_labels?shipment_ids={Resource}&response_type={responseType}";
-                string url = string.Join('/', baseUrl, endpoint);
-
-                string parent = Directory.GetParent(Directory.GetCurrentDirectory()).ToString();
-                string filePath = Path.Combine(parent, "var","opt","someDocument.pdf");
-
-                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-                httpRequestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
-
-                using (HttpClient client = _httpClientFactory.CreateClient())
-                {
-                    HttpResponseMessage httpResponseMessage = await client.SendAsync(httpRequestMessage);
-
-                    if (httpResponseMessage.IsSuccessStatusCode)
-                    {
-                        using (var file = File.Create(filePath))
-                        {
-                            // create a new file to write to
-                            var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(); // get the actual content stream
-                            await contentStream.CopyToAsync(file); // copy that stream to the file stream
-                            await file.FlushAsync(); // flush back to disk before disposing
-                        }
-                    }
-                    return httpResponseMessage;
-                }
-            }
-            catch (Exception ex)
-            {
-                var aver = ex;
-                throw;
-            }
-        }
-        //public async Task<string> GetPrintOrderAsync(long Resource, string AccessToken, bool pdf = true)
+        //public async Task<HttpResponseMessage> GetPrintOrderAsync(long Resource, string AccessToken, bool pdf = true)
         //{
         //    try
         //    {
@@ -203,9 +163,28 @@ namespace Otto.orders.Services
         //        string endpoint = $"shipment_labels?shipment_ids={Resource}&response_type={responseType}";
         //        string url = string.Join('/', baseUrl, endpoint);
 
-        //        var pegaleAca = $"curl -X GET -H 'Authorization: Bearer {AccessToken}' {url}";
-        //        return pegaleAca;
+        //        string parent = Directory.GetParent(Directory.GetCurrentDirectory()).ToString();
+        //        string filePath = Path.Combine(parent, "var","opt","someDocument.pdf");
 
+        //        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+        //        httpRequestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
+
+        //        using (HttpClient client = _httpClientFactory.CreateClient())
+        //        {
+        //            HttpResponseMessage httpResponseMessage = await client.SendAsync(httpRequestMessage);
+
+        //            if (httpResponseMessage.IsSuccessStatusCode)
+        //            {
+        //                using (var file = File.Create(filePath))
+        //                {
+        //                    // create a new file to write to
+        //                    var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(); // get the actual content stream
+        //                    await contentStream.CopyToAsync(file); // copy that stream to the file stream
+        //                    await file.FlushAsync(); // flush back to disk before disposing
+        //                }
+        //            }
+        //            return httpResponseMessage;
+        //        }
         //    }
         //    catch (Exception ex)
         //    {
@@ -213,6 +192,28 @@ namespace Otto.orders.Services
         //        throw;
         //    }
         //}
+
+        public async Task<string> GetPrintOrderAsync(long Resource, string AccessToken, bool pdf = true)
+        {
+            try
+            {
+                //Deberia estar en una variable de entorno
+                string baseUrl = "https://api.mercadolibre.com";
+                //Por ahora solo busco pdf
+                string responseType = pdf ? "pdf" : "zpl2";
+                string endpoint = $"shipment_labels?shipment_ids={Resource}&response_type={responseType}";
+                string url = string.Join('/', baseUrl, endpoint);
+
+                var pegaleAca = $"curl -X GET -H 'Authorization: Bearer {AccessToken}' {url}";
+                return pegaleAca;
+
+            }
+            catch (Exception ex)
+            {
+                var aver = ex;
+                throw;
+            }
+        }
 
 
 
