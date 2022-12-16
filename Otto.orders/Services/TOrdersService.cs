@@ -142,17 +142,17 @@ namespace Otto.orders.Services
             //Por cada producto buscar en el stock
             foreach (var product in order.Products)
             {
-                int productInStockId = await GetProductInStockByItemId(product.ProductId.ToString(), user.Id, isTiendanube: true);
-                if (productInStockId != 0)
+                var productInStock = await GetProductInStockByItemId(product.ProductId.ToString(), user.Id, isTiendanube: true);
+                if (productInStock.Id != 0)
                 {
-                    Order newOrder = GetNeWOrder(user, product, order, productInStockId);
+                    Order newOrder = GetNeWOrder(user, product, order, productInStock.Id);
 
                     Tuple<Order, int> respServ = await _orderService.CreateAsync(newOrder);
 
                     registrosAfectados.Add(respServ);
                 }
                     
-                productsNotInStock.Add(productInStockId);
+                productsNotInStock.Add(productInStock.Id);
 
             }
             LogProductsNotInStock(productsNotInStock, user.Id);
@@ -188,12 +188,12 @@ namespace Otto.orders.Services
 
         }
 
-        private async Task<int> GetProductInStockByItemId(string itemId, int userId, bool isTiendanube = false)
+        private async Task<ProductInStock> GetProductInStockByItemId(string itemId, int userId, bool isTiendanube = false)
         {
             var tupleStockResponse = await _stockService.GetProductInStockByItemId(itemId, userId, isTiendanube: true);
             if (tupleStockResponse.Item1)
                 return tupleStockResponse.Item2;
-            return 0;
+            return null;
         }
 
         private Order GetNeWOrder(User user, Product product, TOrderDTO? order, int productInStockId = 0)

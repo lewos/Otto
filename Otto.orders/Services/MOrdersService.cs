@@ -170,12 +170,12 @@ namespace Otto.orders.Services
                 : null;
 
         }
-        private async Task<int> GetProductInStockByMItemId(string mItemId, int userId)
+        private async Task<ProductInStock> GetProductInStockByMItemId(string mItemId, int userId)
         {
             var tupleStockResponse = await _stockService.GetProductInStockByItemId(mItemId, userId);
             if (tupleStockResponse.Item1)
                 return tupleStockResponse.Item2;
-            return 0;
+            return null;
         }
 
         private bool isOrderInCache(MOrderNotificationDTO dto)
@@ -241,11 +241,11 @@ namespace Otto.orders.Services
             Console.WriteLine($"user de la orden: {user}");
 
             //Buscar ese producto en el stock
-            int productInStockId = await GetProductInStockByMItemId(order?.OrderItems[0].Item.Id, user.Id);
-            Console.WriteLine($"productInStockId: {productInStockId}");
+            var productInStock = await GetProductInStockByMItemId(order?.OrderItems[0].Item.Id, user.Id);
+            Console.WriteLine($"productInStockId: {productInStock.Id}");
 
             //El producto no esta en stock
-            if (productInStockId == 0) 
+            if (productInStock.Id == 0) 
             {
                 Console.WriteLine($"El producto {order?.OrderItems[0].Item.Id} no se encuentra en stock para el usuario {user?.Id}");
                 return 0;
@@ -263,12 +263,13 @@ namespace Otto.orders.Services
                 MOrderId = order?.Id == null ? null : order.Id,
                 MShippingId = order.Shipping?.Id == null ? null : order.Shipping.Id,
                 CompanyId = user?.CompanyId == null ? null : user.CompanyId,                
-                ProductInStockId = productInStockId == 0? null : productInStockId,
+                ProductInStockId = productInStock.Id == 0? null : productInStock.Id,
                 ItemId = order?.OrderItems[0].Item.Id == null ? null : order.OrderItems[0].Item.Id,
                 ItemDescription = order?.OrderItems[0].Item.Title == null ? null : order.OrderItems[0].Item.Title,
                 Quantity = order.OrderItems[0].Quantity,
                 PackId = order.PackId == null ? "Otto-M-" + Guid.NewGuid().ToString("n") : order.PackId.ToString(),
                 SKU = order.OrderItems[0].Item.SellerSku == null ? null : order.OrderItems[0].Item.SellerSku,
+                Location = productInStock.Location,
                 State = OrderState.Pendiente,
                 ShippingStatus = State.Pendiente,
                 Created = utcNow,

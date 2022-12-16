@@ -38,5 +38,6 @@ namespace Otto.models
         public int? UserIdInProgress { get; set; }
         public DateTime? InProgressDateTimeTaken { get; set; }
         public DateTime? InProgressDateTimeModified { get; set; }
+        public string? Location { get; set; }
     }
 }
