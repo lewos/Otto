@@ -180,6 +180,24 @@ namespace Otto.orders.Services
         }
 
 
+        public async Task<PackDTO> GetOrderByPackIdAsync(string packId, int userIdInProgress)
+        {
+            using (var db = new OttoDbContext())
+            {
+                var orders = await db.Orders.Where(t => t.PackId == packId).ToListAsync();
+
+                //var items = new List<OrderDTO>();
+                var items = new List<Order>();
+                foreach (var order in orders)
+                {
+                    //var dto = OrderMapper.GetOrderDTO(order);
+                    items.Add(order);
+                }
+                return new PackDTO(packId, items);
+            }
+        }
+
+
 
         public async Task<Tuple<Order, int>> CreateAsync(Order order)
         {

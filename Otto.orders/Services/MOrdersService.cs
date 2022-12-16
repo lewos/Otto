@@ -28,13 +28,17 @@ namespace Otto.orders.Services
             {
                 Console.WriteLine("llego una orden");
 
+                await Task.Delay(TimeSpan.FromMilliseconds(dto.Attempts*100));
+
                 // TODO Guardar en un cache en memoria, algunas ordenes asi no consulto la base constantemente
                 if (await isNewOrder(dto))
                 {
+                    Console.WriteLine($"nueva orden {dto.Resource} attemp {dto.Attempts}");
                     return await CreateOrder(dto);
                 }
                 else
                 {
+                    Console.WriteLine($"update orden {dto.Resource} attemp {dto.Attempts}");
                     return await UpdateOrder(dto);
                 }
                 return 0;
