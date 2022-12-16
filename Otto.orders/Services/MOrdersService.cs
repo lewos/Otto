@@ -1,4 +1,5 @@
-﻿using Otto.models;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Otto.models;
 using Otto.models.Responses;
 using Otto.orders.DTOs;
 using Otto.orders.Mapper;
@@ -13,13 +14,22 @@ namespace Otto.orders.Services
         private readonly UserService _userService;
         private readonly StockService _stockService;
 
-        public MOrdersService(AccessTokenService accessTokenService, MercadolibreService mercadolibreService, OrderService orderService, UserService userService, StockService stockService)
+        private readonly IMemoryCache _memoryCache;
+        private readonly MemoryCacheEntryOptions _cacheEntryOptions;
+
+        public MOrdersService(AccessTokenService accessTokenService, MercadolibreService mercadolibreService, 
+            OrderService orderService, UserService userService, StockService stockService, IMemoryCache memoryCache)
         {
             _accessTokenService = accessTokenService;
             _mercadolibreService = mercadolibreService;
             _orderService = orderService;
             _userService = userService;
             _stockService = stockService;
+
+            _memoryCache = memoryCache;
+            _cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSize(20)
+                .SetSlidingExpiration(TimeSpan.FromSeconds(3000));
         }
         public async Task<int> ProcesarOrden(MOrderNotificationDTO dto)
         {
@@ -28,7 +38,12 @@ namespace Otto.orders.Services
             {
                 Console.WriteLine("llego una orden");
 
+                // buscar en cache
+                if (isOrderInCache(dto))
+                    return 0;
+
                 await Task.Delay(TimeSpan.FromMilliseconds(dto.Attempts*100));
+
 
                 // TODO Guardar en un cache en memoria, algunas ordenes asi no consulto la base constantemente
                 if (await isNewOrder(dto))
@@ -45,6 +60,9 @@ namespace Otto.orders.Services
             }
             return 0;
         }
+
+
+
         private async Task<int> CreateOrder(MOrderNotificationDTO dto)
         {
             var mOrder = await GetMOrder(dto);
@@ -160,6 +178,31 @@ namespace Otto.orders.Services
             return 0;
         }
 
+        private bool isOrderInCache(MOrderNotificationDTO dto)
+        {
+            try
+            {
+                var resource = long.Parse(dto.Resource.Split("/")[2]);
+                Console.WriteLine($"isOrderInCache resourse {resource}");
+
+                var key = $"resource_{resource}_attemp_{dto.Attempts}";
+                Console.WriteLine($"key {key}");
+
+                if (!_memoryCache.TryGetValue(key, out bool response))
+                {
+                    _memoryCache.Set(key, true, _cacheEntryOptions);
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
         private async Task<bool> isNewOrder(MOrderNotificationDTO dto)
         {
             try
@@ -176,6 +219,7 @@ namespace Otto.orders.Services
                 throw;
             }
         }
+
         private async Task<bool> isNewOrder(long resource)
         {
             try
